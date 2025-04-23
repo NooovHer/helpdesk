@@ -12,9 +12,9 @@ export default {
     theme: {
         extend: {
             colors: {
-                'primary': '#CC1939',
-                'secondary': '#8A8E91'
-
+                primary: '#922c46',
+                secondary: '#8a8e91',
+                hover: '#bb4e69',
             },
             fontFamily: {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],

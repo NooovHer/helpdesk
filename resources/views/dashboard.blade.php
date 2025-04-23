@@ -1,26 +1,29 @@
-// resources/views/dashboard.blade.php
 <x-app-layout>
-    <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-primary">
-            <i class="fas fa-home mr-2"></i>Mi Panel
-        </h1>
-        <div class="flex items-center space-x-4">
-            <span class="text-gray-700">
-                Bienvenido, {{ Auth::user()->name }}
-            </span>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button type="submit" class="text-primary hover:text-primary/80">
-                    <i class="fas fa-sign-out-alt"></i>
-                </button>
-            </form>
-        </div>
-    </div>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Dashboard') }}
+        </h2>
+    </x-slot>
 
-    <div class="grid md:grid-cols-2 gap-6">
-        <x-create-ticket />
-        <x-recent-tickets />
-        <x-help-resources />
-        <x-notifications />
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+
+            <!-- Acceso a los tickets -->
+            <div class="mb-4">
+                <a href="{{ route('tickets.index') }}"
+                    class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                    📋 Ver Todos los Tickets
+                </a>
+            </div>
+
+            <!-- Botón para crear un nuevo ticket -->
+            <div class="mb-4">
+                <a href="{{ route('tickets.create') }}"
+                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                    + Crear Ticket
+                </a>
+            </div>
+
+        </div>
     </div>
 </x-app-layout>
