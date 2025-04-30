@@ -1,10 +1,10 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
+        <h2 class="font-semibold text-xl text-primary leading-tight">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('Ticket') }} #{{ $ticket->id }}
             </h2>
-        </div>
+            </div>
     </x-slot>
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="bg-white rounded-lg shadow-lg overflow-hidden">

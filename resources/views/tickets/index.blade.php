@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            <h2 class="font-semibold text-xl text-primary leading-tight">
                 {{ __('Tickets') }}
             </h2>
 
@@ -80,15 +80,15 @@
                                         </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
-                                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
+                                        <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
                                                 {{
                                                     $ticket->priority == 'alta' ? 'bg-red-100 text-red-800' :
                                                     ($ticket->priority == 'media' ? 'bg-yellow-100 text-yellow-800' :
                                                     ($ticket->priority == 'baja' ? 'bg-green-100 text-green-800' :
                                                     ($ticket->priority == 'urgente' ? 'bg-orange-100 text-orange-800' : 'bg-gray-100 text-gray-800')))
                                                 }}">
-                                                {{ ucfirst($ticket->priority) }}
-                                            </span>
+                                            {{ ucfirst($ticket->priority) }}
+                                        </span>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500">
                                         {{ $ticket->created_at->format('d/m/Y') }}

@@ -32,7 +32,6 @@ class TicketController extends Controller
     }
 
     // Guardar un nuevo ticket
-    // Modifica esta parte en tu TicketController.php
     public function store(Request $request)
     {
         $request->validate([
