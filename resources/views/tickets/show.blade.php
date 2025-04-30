@@ -110,7 +110,11 @@
                 </div>
 
                 @php
-                $attachments = ($ticket->attachments);
+                $attachments = json_decode($ticket->attachments, true);
+                function isImageFile($filename) {
+                $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+                return in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp']);
+                }
                 @endphp
 
                 @if(!empty($attachments))
@@ -118,10 +122,22 @@
                     <h2 class="text-lg font-semibold text-gray-800 mb-3">Archivos adjuntos</h2>
                     <div class="bg-gray-50 rounded-lg p-5 border border-gray-100">
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                            <!-- varios archivos -->
-                            @if(is_array($attachments))
                             @foreach($attachments as $attachment)
-                            <a href="{{ asset('storage/' . $attachment) }}" target="_blank"
+                            @if(isImageFile($attachment))
+                            <div class="border border-gray-200 rounded-md overflow-hidden hover:shadow-md transition-all duration-200">
+                                <div class="relative pb-[60%] bg-gray-100">
+                                    <img src="{{ Storage::url($attachment) }}"
+                                        alt="{{ basename($attachment) }}"
+                                        class="absolute inset-0 w-full h-full object-cover image-thumbnail"
+                                        data-src="{{ Storage::url($attachment) }}"
+                                        data-filename="{{ basename($attachment) }}">
+                                </div>
+                                <div class="p-2 bg-white">
+                                    <p class="text-xs text-gray-700 truncate">{{ basename($attachment) }}</p>
+                                </div>
+                            </div>
+                            @else
+                            <a href="{{ Storage::url($attachment) }}" target="_blank"
                                 class="flex items-center p-3 rounded-md hover:bg-gray-100 border border-gray-200 group transition-colors duration-150">
                                 <div class="bg-indigo-100 p-2 rounded-md mr-3">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none"
@@ -134,23 +150,8 @@
                                     {{ basename($attachment) }}
                                 </div>
                             </a>
-                            @endforeach
-                            <!-- un solo archivo -->
-                            @elseif(is_string($attachments))
-                            <a href="{{ asset('storage/' . $attachments) }}" target="_blank"
-                                class="flex items-center p-3 rounded-md hover:bg-gray-100 border border-gray-200 group transition-colors duration-150">
-                                <div class="bg-gray-200 p-2 rounded-md mr-3">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                                    </svg>
-                                </div>
-                                <div class="text-sm text-gray-700 truncate group-hover:text-primary">
-                                    {{ basename($attachments) }}
-                                </div>
-                            </a>
                             @endif
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -162,6 +163,7 @@
                     </div>
                 </div>
                 @endif
+
                 <!-- Resolución -->
                 @if($ticket->resolved_at)
                 <div class="mb-8">
@@ -231,4 +233,89 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal para vista previa de imágenes -->
+    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center">
+        <div class="max-w-4xl w-full mx-4 bg-white rounded-lg overflow-hidden shadow-xl">
+            <div class="bg-gray-100 px-4 py-3 border-b border-gray-200 flex justify-between items-center">
+                <h3 class="text-lg font-medium text-gray-900" id="modal-title">Vista previa</h3>
+                <button id="closeModalBtn" type="button" class="text-gray-400 hover:text-gray-500">
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="bg-gray-50 p-6 flex items-center justify-center">
+                <img id="modalImage" src="" alt="Imagen" class="max-h-[70vh] max-w-full object-contain">
+            </div>
+            <div class="bg-gray-100 px-4 py-3 border-t border-gray-200 flex justify-between">
+                <a id="downloadBtn" href="" download class="inline-flex items-center px-4 py-2 bg-primary text-white rounded-md font-medium shadow hover:bg-hover transition-colors duration-150">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Descargar
+                </a>
+                <a id="openNewTabBtn" href="" target="_blank" class="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-800 rounded-md font-medium shadow hover:bg-gray-300 transition-colors duration-150">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    Abrir en nueva pestaña
+                </a>
+            </div>
+        </div>
+    </div>
 </x-app-layout>
+
+<!-- Añadir esto justo antes del cierre del body -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Seleccionamos todos los thumbnails de imágenes
+        const thumbnails = document.querySelectorAll('.image-thumbnail');
+        const modal = document.getElementById('imageModal');
+        const modalImage = document.getElementById('modalImage');
+        const modalTitle = document.getElementById('modal-title');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const openNewTabBtn = document.getElementById('openNewTabBtn');
+
+        // Asignamos evento click a cada thumbnail
+        thumbnails.forEach(function(thumbnail) {
+            thumbnail.addEventListener('click', function() {
+                const imageSrc = this.getAttribute('data-src');
+                const filename = this.getAttribute('data-filename');
+
+                // Actualizamos el contenido del modal
+                modalImage.src = imageSrc;
+                modalTitle.textContent = filename;
+                downloadBtn.href = imageSrc;
+                openNewTabBtn.href = imageSrc;
+
+                // Mostramos el modal
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+        // Cerrar el modal al hacer clic en el botón de cerrar
+        closeModalBtn.addEventListener('click', function() {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+        });
+
+        // Cerrar el modal al hacer clic fuera del contenido
+        modal.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Cerrar el modal con la tecla Escape
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        });
+    });
+</script>
