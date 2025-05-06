@@ -62,4 +62,8 @@ class Ticket extends Model
         return $query->where('created_at', '>=', now()->subDays(7))
             ->orderBy('created_at', 'desc');
     }
+    public function comments()
+    {
+        return $this->hasMany(TicketComment::class);
+    }
 }
