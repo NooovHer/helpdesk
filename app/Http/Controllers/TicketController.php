@@ -32,7 +32,6 @@ class TicketController extends Controller
     }
 
     // Guardar un nuevo ticket
-    // Modifica esta parte en tu TicketController.php
     public function store(Request $request)
     {
         $request->validate([
@@ -188,5 +187,25 @@ class TicketController extends Controller
         $ticket->delete();
 
         return redirect()->route('tickets.index')->with('success', 'Ticket eliminado correctamente.');
+    }
+    public function next()
+    {
+        // Encuentra el primer ticket sin assigned_to
+        $ticket = Ticket::whereNull('assigned_to')
+            ->orderBy('created_at')
+            ->first();
+
+        if (! $ticket) {
+            return back()->with('error', 'No hay tickets disponibles para asignar.');
+        }
+
+        $ticket->update([
+            'assigned_to' => Auth::id(),
+            'status'      => 'in_progress',  // o el que uses
+        ]);
+
+        return redirect()
+            ->route('agent.tickets.show', $ticket)
+            ->with('success', 'Ticket asignado correctamente.');
     }
 }

@@ -10,10 +10,20 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Obtener los tickets creados por el usuario autenticado
-        $tickets = Ticket::where('created_by', Auth::id())->orderBy('created_at', 'desc')->get();
+        $user = auth::user();
 
-        // Retornar la vista con los tickets
-        return view('dashboard', compact('tickets'));
+        if ($user && $user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+
+        if ($user && $user->role === 'agent') {
+            return redirect()->route('agent.dashboard');
+        }
+        // Obtener los tickets creados por el usuario autenticado
+        if ($user && $user->role === 'employee') {
+            $tickets = Ticket::where('created_by', Auth::id())->orderBy('created_at', 'desc')->get();
+            // Retornar la vista con los tickets
+            return view('dashboard', compact('tickets'));
+        }
     }
 }

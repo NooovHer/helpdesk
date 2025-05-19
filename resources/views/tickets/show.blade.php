@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            <h2 class="font-semibold text-xl text-primary leading-tight">
                 {{ __('Ticket') }} #{{ $ticket->id }}
             </h2>
         </div>
@@ -20,7 +20,7 @@
                         </p>
                     </div>
                     <div class="flex flex-wrap gap-2 mt-4 md:mt-0">
-                        @if($ticket->status != 'closed')
+                        @if($ticket->status != 'closed' && $ticket->creator_id == auth()->id())
                         <a href="{{ route('tickets.edit', $ticket) }}"
                             class="inline-flex items-center px-4 py-2 bg-white text-primary rounded-md font-medium shadow hover:bg-red-50 transition-colors duration-150">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
@@ -164,7 +164,7 @@
                 </div>
                 @endif
 
-                <!-- Resolución -->
+                <!-- Resolución (si el ticket está resuelto) -->
                 @if($ticket->resolved_at)
                 <div class="mb-8">
                     <h2 class="text-lg font-semibold text-gray-800 mb-3">Resolución</h2>
@@ -184,6 +184,117 @@
                 </div>
                 @endif
 
+                <!-- Historial de comentarios -->
+                <div class="mb-8">
+                    <h2 class="text-lg font-semibold text-gray-800 mb-3">Historial de comentarios</h2>
+
+                    <!-- Lista de comentarios existentes -->
+                    <div class="space-y-4 mb-6">
+                        @forelse($ticket->comments ?? [] as $comment)
+                        <div class="bg-gray-50 rounded-lg p-5 border border-gray-100">
+                            <div class="flex justify-between mb-3">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0">
+                                        <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center">
+                                            {{ strtoupper(substr($comment->user->username ?? 'U', 0, 1)) }}
+                                        </div>
+                                    </div>
+                                    <div class="ml-3">
+                                        <p class="text-sm font-medium text-gray-900">{{ $comment->user->username ?? 'Usuario' }}</p>
+                                        <p class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($comment->created_at)->format('d/m/Y H:i') }}</p>
+                                    </div>
+                                </div>
+                                <div>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                    {{ $comment->is_internal ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800' }}">
+                                        {{ $comment->is_internal ? 'Nota interna' : 'Comentario público' }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="prose max-w-none">
+                                {!! nl2br(e($comment->content)) !!}
+                            </div>
+
+                            <!-- Adjuntos del comentario -->
+                            @if(!empty(json_decode($comment->attachments ?? '[]', true)))
+                            <div class="mt-4 pt-4 border-t border-gray-100">
+                                <h4 class="text-sm font-medium text-gray-700 mb-2">Archivos adjuntos:</h4>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    @foreach(json_decode($comment->attachments, true) as $attachment)
+                                    @if(isImageFile($attachment))
+                                    <div class="border border-gray-200 rounded-md overflow-hidden hover:shadow-md transition-all duration-200">
+                                        <div class="relative pb-[60%] bg-gray-100">
+                                            <img src="{{ Storage::url($attachment) }}"
+                                                alt="{{ basename($attachment) }}"
+                                                class="absolute inset-0 w-full h-full object-cover image-thumbnail"
+                                                data-src="{{ Storage::url($attachment) }}"
+                                                data-filename="{{ basename($attachment) }}">
+                                        </div>
+                                        <div class="p-2 bg-white">
+                                            <p class="text-xs text-gray-700 truncate">{{ basename($attachment) }}</p>
+                                        </div>
+                                    </div>
+                                    @else
+                                    <a href="{{ Storage::url($attachment) }}" target="_blank"
+                                        class="flex items-center p-2 rounded-md hover:bg-gray-100 border border-gray-200 group transition-colors duration-150">
+                                        <div class="bg-indigo-100 p-1 rounded-md mr-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                            </svg>
+                                        </div>
+                                        <div class="text-xs text-gray-700 truncate group-hover:text-primary">
+                                            {{ basename($attachment) }}
+                                        </div>
+                                    </a>
+                                    @endif
+                                    @endforeach
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+                        @empty
+                        <div class="bg-gray-50 rounded-lg p-5 border border-gray-100 text-center text-gray-500">
+                            No hay comentarios en este ticket.
+                        </div>
+                        @endforelse
+                    </div>
+
+                    <!-- Formulario para agregar comentario (solo si el ticket no está cerrado) -->
+                    @if($ticket->status != 'closed')
+                    <div class="bg-gray-100 rounded-lg p-5 border border-gray-200">
+                        <h3 class="text-md font-semibold text-gray-800 mb-4">Añadir comentario</h3>
+                        <form action="{{ route('tickets.comments.store', $ticket) }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <div class="mb-4">
+                                <label for="content" class="block text-sm font-medium text-gray-700 mb-1">Comentario</label>
+                                <textarea id="content" name="content" rows="4"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                                    placeholder="Escribe tu comentario aquí..."></textarea>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="attachments" class="block text-sm font-medium text-gray-700 mb-1">Adjuntos (opcional)</label>
+                                <input type="file" id="attachments" name="attachments[]" multiple
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                <p class="text-xs text-gray-500 mt-1">Puedes seleccionar múltiples archivos. Máximo 10MB por archivo.</p>
+                            </div>
+
+                            <button type="submit"
+                                class="inline-flex items-center px-4 py-2 bg-primary text-white rounded-md font-medium shadow-sm hover:bg-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-150">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                </svg>
+                                Enviar comentario
+                            </button>
+                        </form>
+                    </div>
+                    @endif
+                </div>
+
                 <!-- Información adicional -->
                 <div class="mb-8">
                     <h2 class="text-lg font-semibold text-gray-800 mb-3">Información adicional</h2>
@@ -202,34 +313,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Formulario de resolución -->
-                @if($ticket->status != 'closed' && (auth()->user()->role == 'manager' || auth()->user()->role == 'admin'))
-                <div class="bg-gray-200 rounded-lg p-6 border border-gray-300">
-                    <h2 class="text-lg font-semibold text-primary mb-4">Marcar como resuelto</h2>
-                    <form action="{{ route('tickets.update', $ticket) }}" method="POST">
-                        @csrf
-                        @method('PUT')
-                        <input type="hidden" name="status" value="closed">
-                        <div class="mb-4">
-                            <label for="resolution_notes" class="block text-sm font-medium text-primary mb-2">Notas
-                                de resolución</label>
-                            <textarea id="resolution_notes" name="resolution_notes" rows="4"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                                placeholder="Describe cómo se resolvió el ticket...">{{ $ticket->resolution_notes }}</textarea>
-                        </div>
-                        <button type="submit"
-                            class="inline-flex items-center px-4 py-2 bg-primary text-white rounded-md font-medium shadow-sm hover:bg-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-150">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M5 13l4 4L19 7" />
-                            </svg>
-                            Resolver ticket
-                        </button>
-                    </form>
-                </div>
-                @endif
             </div>
         </div>
     </div>
@@ -266,7 +349,7 @@
     </div>
 </x-app-layout>
 
-<!-- Añadir esto justo antes del cierre del body -->
+<!-- Script para el modal de imágenes -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Seleccionamos todos los thumbnails de imágenes
