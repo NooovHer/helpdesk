@@ -1,152 +1,87 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-primary leading-tight">
-                {{ __('Ticket') }} #{{ $ticket->id }}
-            </h2>
-        </div>
-    </x-slot>
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-            <!-- Encabezado del ticket -->
-            <div class="bg-gradient-to-r from-primary to-red-500 px-6 py-4">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
-                    <div class="flex-1">
-                        <h1 class="text-xl md:text-2xl font-bold text-white">
-                            {{ $ticket->title }}
+    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-100 py-8">
+        <div class="max-w-6xl mx-auto px-4 space-y-6">
+
+            <!-- Encabezado -->
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <div class="flex items-center gap-3 mb-2">
+                        <a href="{{ route('tickets.index') }}" class="text-blue-600 hover:text-blue-800">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                        <h1 class="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                            Ticket #{{ $ticket->id }}
                         </h1>
-                        <p class="text-white mt-1">Creado
-                            {{ \Carbon\Carbon::parse($ticket->created_at)->diffForHumans() }}
-                        </p>
                     </div>
-                    <div class="flex flex-wrap gap-2 mt-4 md:mt-0">
-                        @if($ticket->status != 'closed' && $ticket->creator_id == auth()->id())
-                        <a href="{{ route('tickets.edit', $ticket) }}"
-                            class="inline-flex items-center px-4 py-2 bg-white text-primary rounded-md font-medium shadow hover:bg-red-50 transition-colors duration-150">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 0L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                            Editar
-                        </a>
-                        @endif
-                        <a href="{{ route('tickets.index') }}"
-                            class="inline-flex items-center px-4 py-2 bg-white bg-opacity-20 text-white rounded-md font-medium hover:bg-opacity-30 transition-colors duration-150">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                            </svg>
-                            Volver
-                        </a>
-                    </div>
+                    <p class="text-gray-600 text-lg">{{ $ticket->title }}</p>
+                    <p class="text-sm text-gray-500">Creado {{ \Carbon\Carbon::parse($ticket->created_at)->diffForHumans() }}</p>
+                </div>
+                <div class="flex gap-3">
+                    @if($ticket->status != 'cerrado' && $ticket->creator_id == auth()->id())
+                    <a href="{{ route('tickets.edit', $ticket) }}"
+                        class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-yellow-500 to-yellow-600 text-white rounded-xl font-semibold shadow-lg hover:from-yellow-600 hover:to-yellow-700 transition">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                    @endif
+                    <a href="{{ route('tickets.index') }}"
+                        class="flex items-center gap-2 px-6 py-3 bg-gray-500 text-white rounded-xl font-semibold hover:bg-gray-600 transition shadow-lg">
+                        <i class="fas fa-list"></i> Mis Tickets
+                    </a>
                 </div>
             </div>
 
-            <div class="p-6">
-                <!-- Información del ticket -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <div class="bg-gray-50 rounded-lg p-5 border border-gray-100">
-                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Detalles del ticket</h2>
-                        <div class="space-y-3">
-                            <div class="flex items-center">
-                                <span class="text-gray-600 w-24">Estado:</span>
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                {{ $ticket->status == 'nuevo' ? 'bg-green-100 text-green-800' :
-                                    ($ticket->status == 'en progreso' ? 'bg-yellow-100 text-yellow-800' :
-                                    ($ticket->status == 'resuelto' ? 'bg-blue-100 text-blue-800' :
-                                    ($ticket->status == 'cerrado' ? 'bg-red-100 text-red-800' :
-                                    'bg-gray-100 text-gray-800'))) }}">
-                                    {{ ucfirst(str_replace('_', ' ', $ticket->status)) }}
-                                </span>
-                            </div>
-                            <div class="flex items-center">
-                                <span class="text-gray-600 w-24">Prioridad:</span>
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                {{ $ticket->priority == 'alta' ? 'bg-red-100 text-red-800' :
-                                ($ticket->priority == 'media' ? 'bg-yellow-100 text-yellow-800' :
-                                ($ticket->priority == 'baja' ? 'bg-green-100 text-green-800' :
-                                ($ticket->priority == 'urgente' ? 'bg-orange-100 text-orange-800' :
-                                'bg-blue-100 text-blue-800'))) }}">
-                                    {{ ucfirst($ticket->priority) }}
-                                </span>
-                            </div>
-                            <div class="flex items-center">
-                                <span class="text-gray-600 w-28">Departamento:</span>
-                                <span class="text-gray-900">{{ $ticket->department->name ?? 'N/A' }}</span>
-                            </div>
-                            <div class="flex items-center">
-                                <span class="text-gray-600 w-24">Categoría:</span>
-                                <span class="text-gray-900">{{ $ticket->category->name }}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-gray-50 rounded-lg p-5 border border-gray-100">
-                        <h2 class="text-lg font-semibold text-gray-800 mb-4">Asignación</h2>
-                        <div class="space-y-3">
-                            <div class="flex items-center">
-                                <span class="text-gray-600 w-28">Creado por:</span>
-                                <span class="text-gray-900">{{ $ticket->creator->username ?? 'N/A' }}</span>
-
-                            </div>
-                            <div class="flex items-center">
-                                <span class="text-gray-600 w-28">Asignado a:</span>
-                                <span class="text-gray-900">{{ $ticket->assignedTo->username ?? 'No asignado' }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Descripción -->
-                <div class="mb-8">
-                    <h2 class="text-lg font-semibold text-gray-800 mb-3">Descripción</h2>
-                    <div class="bg-gray-50 rounded-lg p-5 border border-gray-100">
+            <!-- Información del ticket -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Detalles principales -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Descripción -->
+                    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6">
+                        <h3 class="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
+                            <i class="fas fa-file-alt text-blue-500"></i>
+                            Descripción
+                        </h3>
                         <div class="prose max-w-none">
-                            {!! nl2br(e($ticket->description)) !!}
+                            <p class="text-gray-700 whitespace-pre-wrap">{{ $ticket->description }}</p>
                         </div>
                     </div>
-                </div>
 
-                @php
-                $attachments = json_decode($ticket->attachments, true);
-                function isImageFile($filename) {
-                $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-                return in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp']);
-                }
-                @endphp
+                    @php
+                    $attachments = json_decode($ticket->attachments, true);
+                    function isImageFile($filename) {
+                        $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+                        return in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp']);
+                    }
+                    @endphp
 
-                @if(!empty($attachments))
-                <div class="mb-8">
-                    <h2 class="text-lg font-semibold text-gray-800 mb-3">Archivos adjuntos</h2>
-                    <div class="bg-gray-50 rounded-lg p-5 border border-gray-100">
+                    @if(!empty($attachments))
+                    <!-- Archivos adjuntos -->
+                    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6">
+                        <h3 class="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
+                            <i class="fas fa-paperclip text-green-500"></i>
+                            Archivos adjuntos
+                        </h3>
                         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                             @foreach($attachments as $attachment)
                             @if(isImageFile($attachment))
-                            <div class="border border-gray-200 rounded-md overflow-hidden hover:shadow-md transition-all duration-200">
+                            <div class="border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-all duration-200">
                                 <div class="relative pb-[60%] bg-gray-100">
                                     <img src="{{ Storage::url($attachment) }}"
                                         alt="{{ basename($attachment) }}"
-                                        class="absolute inset-0 w-full h-full object-cover image-thumbnail"
+                                        class="absolute inset-0 w-full h-full object-cover image-thumbnail cursor-pointer"
                                         data-src="{{ Storage::url($attachment) }}"
                                         data-filename="{{ basename($attachment) }}">
                                 </div>
-                                <div class="p-2 bg-white">
+                                <div class="p-3 bg-white">
                                     <p class="text-xs text-gray-700 truncate">{{ basename($attachment) }}</p>
                                 </div>
                             </div>
                             @else
                             <a href="{{ Storage::url($attachment) }}" target="_blank"
-                                class="flex items-center p-3 rounded-md hover:bg-gray-100 border border-gray-200 group transition-colors duration-150">
-                                <div class="bg-indigo-100 p-2 rounded-md mr-3">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                                    </svg>
+                                class="flex items-center p-3 rounded-xl hover:bg-gray-50 border border-gray-200 group transition-colors duration-150">
+                                <div class="bg-indigo-100 p-2 rounded-lg mr-3">
+                                    <i class="fas fa-file text-indigo-600 text-lg"></i>
                                 </div>
-                                <div class="text-sm text-gray-700 truncate group-hover:text-primary">
+                                <div class="text-sm text-gray-700 truncate group-hover:text-indigo-600">
                                     {{ basename($attachment) }}
                                 </div>
                             </a>
@@ -154,162 +89,221 @@
                             @endforeach
                         </div>
                     </div>
-                </div>
-                @elseif(!empty($ticket->attachments))
-                <div class="mb-8">
-                    <h2 class="text-lg font-semibold text-gray-800 mb-3">Archivos adjuntos</h2>
-                    <div class="bg-gray-50 rounded-lg p-5 border border-gray-100">
-                        <p class="text-gray-500">Error al cargar los archivos adjuntos. Formato no válido.</p>
-                    </div>
-                </div>
-                @endif
+                    @endif
 
-                <!-- Resolución (si el ticket está resuelto) -->
-                @if($ticket->resolved_at)
-                <div class="mb-8">
-                    <h2 class="text-lg font-semibold text-gray-800 mb-3">Resolución</h2>
-                    <div class="bg-gray-50 rounded-lg p-5 border border-gray-100">
-                        <div class="mb-4">
-                            <span class="text-gray-600">Fecha de resolución:</span>
-                            <span
-                                class="text-gray-900 ml-2">{{ \Carbon\Carbon::parse($ticket->resolved_at)->format('d/m/Y H:i') }}</span>
-                        </div>
-                        <div>
-                            <span class="text-gray-600 block mb-2">Notas de resolución:</span>
-                            <div class="prose max-w-none">
-                                {!! nl2br(e($ticket->resolution_notes)) !!}
+                    <!-- Resolución (si el ticket está resuelto) -->
+                    @if($ticket->resolved_at)
+                    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6">
+                        <h3 class="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
+                            <i class="fas fa-check-circle text-green-500"></i>
+                            Resolución
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between p-3 bg-green-50 rounded-xl">
+                                <span class="text-gray-600 font-medium">Fecha de resolución:</span>
+                                <span class="text-gray-900 font-semibold">{{ \Carbon\Carbon::parse($ticket->resolved_at)->format('d/m/Y H:i') }}</span>
+                            </div>
+                            <div class="p-4 bg-gray-50 rounded-xl">
+                                <span class="text-gray-600 block mb-2 font-medium">Notas de resolución:</span>
+                                <div class="prose max-w-none">
+                                    <p class="text-gray-700 whitespace-pre-wrap">{{ $ticket->resolution_notes }}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                @endif
+                    @endif
 
-                <!-- Historial de comentarios -->
-                <div class="mb-8">
-                    <h2 class="text-lg font-semibold text-gray-800 mb-3">Historial de comentarios</h2>
+                    <!-- Historial de comentarios -->
+                    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6">
+                        <h3 class="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
+                            <i class="fas fa-comments text-purple-500"></i>
+                            Comentarios ({{ $ticket->comments->count() }})
+                        </h3>
 
-                    <!-- Lista de comentarios existentes -->
-                    <div class="space-y-4 mb-6">
-                        @forelse($ticket->comments ?? [] as $comment)
-                        <div class="bg-gray-50 rounded-lg p-5 border border-gray-100">
-                            <div class="flex justify-between mb-3">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0">
-                                        <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center">
-                                            {{ strtoupper(substr($comment->user->username ?? 'U', 0, 1)) }}
-                                        </div>
+                        @if($ticket->comments->count() > 0)
+                        <div class="space-y-4">
+                            @foreach($ticket->comments as $comment)
+                            <div class="border-l-4 border-blue-500 pl-4 py-3 bg-gray-50 rounded-r-xl">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <div class="w-8 h-8 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+                                        {{ strtoupper(substr($comment->user->username ?? 'U', 0, 1)) }}
                                     </div>
-                                    <div class="ml-3">
-                                        <p class="text-sm font-medium text-gray-900">{{ $comment->user->username ?? 'Usuario' }}</p>
-                                        <p class="text-xs text-gray-500">{{ \Carbon\Carbon::parse($comment->created_at)->format('d/m/Y H:i') }}</p>
-                                    </div>
-                                </div>
-                                <div>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                    {{ $comment->is_internal ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800' }}">
-                                        {{ $comment->is_internal ? 'Nota interna' : 'Comentario público' }}
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="prose max-w-none">
-                                {!! nl2br(e($comment->content)) !!}
-                            </div>
-
-                            <!-- Adjuntos del comentario -->
-                            @if(!empty(json_decode($comment->attachments ?? '[]', true)))
-                            <div class="mt-4 pt-4 border-t border-gray-100">
-                                <h4 class="text-sm font-medium text-gray-700 mb-2">Archivos adjuntos:</h4>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                    @foreach(json_decode($comment->attachments, true) as $attachment)
-                                    @if(isImageFile($attachment))
-                                    <div class="border border-gray-200 rounded-md overflow-hidden hover:shadow-md transition-all duration-200">
-                                        <div class="relative pb-[60%] bg-gray-100">
-                                            <img src="{{ Storage::url($attachment) }}"
-                                                alt="{{ basename($attachment) }}"
-                                                class="absolute inset-0 w-full h-full object-cover image-thumbnail"
-                                                data-src="{{ Storage::url($attachment) }}"
-                                                data-filename="{{ basename($attachment) }}">
-                                        </div>
-                                        <div class="p-2 bg-white">
-                                            <p class="text-xs text-gray-700 truncate">{{ basename($attachment) }}</p>
-                                        </div>
-                                    </div>
-                                    @else
-                                    <a href="{{ Storage::url($attachment) }}" target="_blank"
-                                        class="flex items-center p-2 rounded-md hover:bg-gray-100 border border-gray-200 group transition-colors duration-150">
-                                        <div class="bg-indigo-100 p-1 rounded-md mr-2">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                                            </svg>
-                                        </div>
-                                        <div class="text-xs text-gray-700 truncate group-hover:text-primary">
-                                            {{ basename($attachment) }}
-                                        </div>
-                                    </a>
+                                    <span class="font-semibold text-gray-700">{{ $comment->user->username ?? 'Usuario' }}</span>
+                                    <span class="text-sm text-gray-500">{{ $comment->created_at->diffForHumans() }}</span>
+                                    @if($comment->is_internal)
+                                    <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">Nota interna</span>
                                     @endif
-                                    @endforeach
                                 </div>
+                                <p class="text-gray-700">{{ $comment->content }}</p>
+
+                                @if(!empty(json_decode($comment->attachments ?? '[]', true)))
+                                <div class="mt-3 pt-3 border-t border-gray-200">
+                                    <h4 class="text-sm font-medium text-gray-700 mb-2">Archivos adjuntos:</h4>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                        @foreach(json_decode($comment->attachments, true) as $attachment)
+                                        @if(isImageFile($attachment))
+                                        <div class="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-all duration-200">
+                                            <div class="relative pb-[60%] bg-gray-100">
+                                                <img src="{{ Storage::url($attachment) }}"
+                                                    alt="{{ basename($attachment) }}"
+                                                    class="absolute inset-0 w-full h-full object-cover image-thumbnail cursor-pointer"
+                                                    data-src="{{ Storage::url($attachment) }}"
+                                                    data-filename="{{ basename($attachment) }}">
+                                            </div>
+                                            <div class="p-2 bg-white">
+                                                <p class="text-xs text-gray-700 truncate">{{ basename($attachment) }}</p>
+                                            </div>
+                                        </div>
+                                        @else
+                                        <a href="{{ Storage::url($attachment) }}" target="_blank"
+                                            class="flex items-center p-2 rounded-lg hover:bg-gray-100 border border-gray-200 group transition-colors duration-150">
+                                            <div class="bg-indigo-100 p-1 rounded-md mr-2">
+                                                <i class="fas fa-file text-indigo-600 text-sm"></i>
+                                            </div>
+                                            <div class="text-xs text-gray-700 truncate group-hover:text-indigo-600">
+                                                {{ basename($attachment) }}
+                                            </div>
+                                        </a>
+                                        @endif
+                                        @endforeach
+                                    </div>
+                                </div>
+                                @endif
+                            </div>
+                            @endforeach
+                        </div>
+                        @else
+                        <div class="text-center py-8 text-gray-500">
+                            <i class="fas fa-comment-slash text-4xl mb-3 text-gray-300"></i>
+                            <p>No hay comentarios en este ticket.</p>
+                        </div>
+                        @endif
+
+                        @if($ticket->status != 'cerrado')
+                        <!-- Formulario para nuevo comentario -->
+                        <div class="mt-6 p-4 bg-gray-50 rounded-xl">
+                            <h4 class="text-md font-semibold text-gray-700 mb-3">Añadir comentario</h4>
+                            <form action="{{ route('tickets.comments.store', $ticket) }}" method="POST" enctype="multipart/form-data">
+                                @csrf
+                                <div class="space-y-3">
+                                    <textarea name="content" rows="3" placeholder="Escribe tu comentario aquí..."
+                                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"></textarea>
+                                    <div>
+                                        <label for="attachments" class="block text-sm font-medium text-gray-700 mb-1">Adjuntos (opcional)</label>
+                                        <input type="file" id="attachments" name="attachments[]" multiple
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <p class="text-xs text-gray-500 mt-1">Puedes seleccionar múltiples archivos. Máximo 10MB por archivo.</p>
+                                    </div>
+                                    <button type="submit" class="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition font-semibold">
+                                        <i class="fas fa-paper-plane mr-2"></i>Enviar comentario
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Panel lateral -->
+                <div class="space-y-6">
+                    <!-- Estado y prioridad -->
+                    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6">
+                        <h3 class="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
+                            <i class="fas fa-cog text-purple-500"></i>
+                            Estado del Ticket
+                        </h3>
+
+                        <div class="space-y-4">
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+                                <span class="text-gray-600 font-medium">Estado:</span>
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
+                                    {{ $ticket->status == 'nuevo' ? 'bg-green-100 text-green-800' :
+                                        ($ticket->status == 'en progreso' ? 'bg-yellow-100 text-yellow-800' :
+                                        ($ticket->status == 'resuelto' ? 'bg-blue-100 text-blue-800' :
+                                        ($ticket->status == 'cerrado' ? 'bg-red-100 text-red-800' :
+                                        'bg-gray-100 text-gray-800'))) }}">
+                                    <i class="fas fa-circle mr-1 text-xs"></i> {{ ucfirst(str_replace('_', ' ', $ticket->status)) }}
+                                </span>
+                            </div>
+
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+                                <span class="text-gray-600 font-medium">Prioridad:</span>
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
+                                    {{ $ticket->priority == 'alta' ? 'bg-red-100 text-red-800' :
+                                    ($ticket->priority == 'media' ? 'bg-yellow-100 text-yellow-800' :
+                                    ($ticket->priority == 'baja' ? 'bg-green-100 text-green-800' :
+                                    ($ticket->priority == 'urgente' ? 'bg-orange-100 text-orange-800' :
+                                    'bg-blue-100 text-blue-800'))) }}">
+                                    <i class="fas fa-bolt mr-1 text-xs"></i> {{ ucfirst($ticket->priority) }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información del ticket -->
+                    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6">
+                        <h3 class="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
+                            <i class="fas fa-info-circle text-blue-500"></i>
+                            Información
+                        </h3>
+
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Departamento:</span>
+                                <span class="text-gray-800 font-medium">{{ $ticket->department->name ?? 'Sin departamento' }}</span>
+                            </div>
+
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Categoría:</span>
+                                <span class="text-gray-800 font-medium">{{ $ticket->category->name ?? 'Sin categoría' }}</span>
+                            </div>
+
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Creado por:</span>
+                                <span class="text-gray-800 font-medium">{{ $ticket->creator->username ?? 'Usuario' }}</span>
+                            </div>
+
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Asignado a:</span>
+                                <span class="text-gray-800 font-medium">{{ $ticket->assignedTo->username ?? 'No asignado' }}</span>
+                            </div>
+
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Fecha creación:</span>
+                                <span class="text-gray-800 font-medium">{{ $ticket->created_at->format('d/m/Y H:i') }}</span>
+                            </div>
+
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Última actualización:</span>
+                                <span class="text-gray-800 font-medium">{{ $ticket->updated_at->format('d/m/Y H:i') }}</span>
+                            </div>
+
+                            @if($ticket->resolved_at)
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Resuelto:</span>
+                                <span class="text-gray-800 font-medium">{{ $ticket->resolved_at->format('d/m/Y H:i') }}</span>
                             </div>
                             @endif
                         </div>
-                        @empty
-                        <div class="bg-gray-50 rounded-lg p-5 border border-gray-100 text-center text-gray-500">
-                            No hay comentarios en este ticket.
-                        </div>
-                        @endforelse
                     </div>
 
-                    <!-- Formulario para agregar comentario (solo si el ticket no está cerrado) -->
-                    @if($ticket->status != 'closed')
-                    <div class="bg-gray-100 rounded-lg p-5 border border-gray-200">
-                        <h3 class="text-md font-semibold text-gray-800 mb-4">Añadir comentario</h3>
-                        <form action="{{ route('tickets.comments.store', $ticket) }}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                            <div class="mb-4">
-                                <label for="content" class="block text-sm font-medium text-gray-700 mb-1">Comentario</label>
-                                <textarea id="content" name="content" rows="4"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                                    placeholder="Escribe tu comentario aquí..."></textarea>
-                            </div>
+                    <!-- Acciones rápidas -->
+                    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6">
+                        <h3 class="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
+                            <i class="fas fa-bolt text-yellow-500"></i>
+                            Acciones Rápidas
+                        </h3>
 
-                            <div class="mb-4">
-                                <label for="attachments" class="block text-sm font-medium text-gray-700 mb-1">Adjuntos (opcional)</label>
-                                <input type="file" id="attachments" name="attachments[]" multiple
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                                <p class="text-xs text-gray-500 mt-1">Puedes seleccionar múltiples archivos. Máximo 10MB por archivo.</p>
-                            </div>
+                        <div class="space-y-3">
+                            <a href="{{ route('tickets.create') }}" class="flex items-center gap-2 w-full px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition">
+                                <i class="fas fa-plus"></i>
+                                Nuevo Ticket
+                            </a>
 
-                            <button type="submit"
-                                class="inline-flex items-center px-4 py-2 bg-primary text-white rounded-md font-medium shadow-sm hover:bg-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-colors duration-150">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                                </svg>
-                                Enviar comentario
-                            </button>
-                        </form>
-                    </div>
-                    @endif
-                </div>
-
-                <!-- Información adicional -->
-                <div class="mb-8">
-                    <h2 class="text-lg font-semibold text-gray-800 mb-3">Información adicional</h2>
-                    <div class="bg-gray-50 rounded-lg p-5 border border-gray-100">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <span class="text-gray-600">Creado el:</span>
-                                <span
-                                    class="text-gray-900 ml-2">{{ \Carbon\Carbon::parse($ticket->created_at)->format('d/m/Y H:i') }}</span>
-                            </div>
-                            <div>
-                                <span class="text-gray-600">Última actualización:</span>
-                                <span
-                                    class="text-gray-900 ml-2">{{ \Carbon\Carbon::parse($ticket->updated_at)->format('d/m/Y H:i') }}</span>
-                            </div>
+                            <a href="{{ route('tickets.index') }}" class="flex items-center gap-2 w-full px-4 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition">
+                                <i class="fas fa-list"></i>
+                                Ver Todos
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -317,42 +311,36 @@
         </div>
     </div>
 
-    <!-- Modal para vista previa de imágenes -->
-    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 z-50 hidden flex items-center justify-center">
-        <div class="max-w-4xl w-full mx-4 bg-white rounded-lg overflow-hidden shadow-xl">
-            <div class="bg-gray-100 px-4 py-3 border-b border-gray-200 flex justify-between items-center">
-                <h3 class="text-lg font-medium text-gray-900" id="modal-title">Vista previa</h3>
-                <button id="closeModalBtn" type="button" class="text-gray-400 hover:text-gray-500">
-                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
+    <!-- Modal para imágenes -->
+    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-4xl max-h-full overflow-hidden">
+            <div class="flex justify-between items-center p-4 border-b">
+                <h3 id="modal-title" class="text-lg font-semibold text-gray-800"></h3>
+                <div class="flex gap-2">
+                    <a id="downloadBtn" href="#" download class="px-3 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+                        <i class="fas fa-download"></i>
+                    </a>
+                    <a id="openNewTabBtn" href="#" target="_blank" class="px-3 py-1 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>
+                    <button id="closeModalBtn" class="px-3 py-1 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
             </div>
-            <div class="bg-gray-50 p-6 flex items-center justify-center">
-                <img id="modalImage" src="" alt="Imagen" class="max-h-[70vh] max-w-full object-contain">
-            </div>
-            <div class="bg-gray-100 px-4 py-3 border-t border-gray-200 flex justify-between">
-                <a id="downloadBtn" href="" download class="inline-flex items-center px-4 py-2 bg-primary text-white rounded-md font-medium shadow hover:bg-hover transition-colors duration-150">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    Descargar
-                </a>
-                <a id="openNewTabBtn" href="" target="_blank" class="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-800 rounded-md font-medium shadow hover:bg-gray-300 transition-colors duration-150">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                    Abrir en nueva pestaña
-                </a>
+            <div class="p-4">
+                <img id="modalImage" src="" alt="" class="max-w-full max-h-96 object-contain">
             </div>
         </div>
     </div>
+
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </x-app-layout>
 
 <!-- Script para el modal de imágenes -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Seleccionamos todos los thumbnails de imágenes
         const thumbnails = document.querySelectorAll('.image-thumbnail');
         const modal = document.getElementById('imageModal');
         const modalImage = document.getElementById('modalImage');
@@ -361,31 +349,26 @@
         const downloadBtn = document.getElementById('downloadBtn');
         const openNewTabBtn = document.getElementById('openNewTabBtn');
 
-        // Asignamos evento click a cada thumbnail
         thumbnails.forEach(function(thumbnail) {
             thumbnail.addEventListener('click', function() {
                 const imageSrc = this.getAttribute('data-src');
                 const filename = this.getAttribute('data-filename');
 
-                // Actualizamos el contenido del modal
                 modalImage.src = imageSrc;
                 modalTitle.textContent = filename;
                 downloadBtn.href = imageSrc;
                 openNewTabBtn.href = imageSrc;
 
-                // Mostramos el modal
                 modal.classList.remove('hidden');
                 document.body.style.overflow = 'hidden';
             });
         });
 
-        // Cerrar el modal al hacer clic en el botón de cerrar
         closeModalBtn.addEventListener('click', function() {
             modal.classList.add('hidden');
             document.body.style.overflow = '';
         });
 
-        // Cerrar el modal al hacer clic fuera del contenido
         modal.addEventListener('click', function(event) {
             if (event.target === modal) {
                 modal.classList.add('hidden');
@@ -393,7 +376,6 @@
             }
         });
 
-        // Cerrar el modal con la tecla Escape
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape' && !modal.classList.contains('hidden')) {
                 modal.classList.add('hidden');

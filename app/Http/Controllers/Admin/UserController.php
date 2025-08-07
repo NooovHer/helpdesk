@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Computer;
 
 class UserController extends Controller
 {
@@ -23,10 +24,15 @@ class UserController extends Controller
     /**
      * Show the form for creating a new user.
      */
+
+
     public function create()
     {
-        return view('admin.users.create');
+        $computers = Computer::all(); // o puedes filtrar solo los disponibles
+
+        return view('admin.users.create', compact('computers'));
     }
+
 
     /**
      * Store a newly created user in storage.
@@ -59,7 +65,11 @@ class UserController extends Controller
     {
         return view('admin.users.edit', compact('user'));
     }
-
+    public function show($id)
+    {
+        $user = User::with('pc')->findOrFail($id);
+        return view('admin.users.show', compact('user'));
+    }
     /**
      * Update the specified user in storage.
      */

@@ -15,7 +15,6 @@ class TicketController extends Controller
     // Mostrar todos los tickets
     public function index()
     {
-        // Obtener todos los tickets, incluidos los relacionados con el usuario (creador, asignado, departamento, categoría)
         $tickets = Ticket::with('creator', 'assignedTo', 'department', 'category')
             ->orderBy('created_at', 'desc')
             ->get();
@@ -35,53 +34,53 @@ class TicketController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'priority' => 'required|in:baja,media,alta,urgente',
+            'title'         => 'required|string|max:255',
+            'description'   => 'required|string',
+            'priority'      => 'required|in:baja,media,alta,urgente',
             'department_id' => 'nullable|exists:departments,id',
-            'category_id' => 'nullable|exists:categories,id',
-            'assigned_to' => 'nullable|exists:users,id',
-            'attachments' => 'nullable|array',
+            'category_id'   => 'nullable|exists:categories,id',
+            'assigned_to'   => 'nullable|exists:users,id',
+            'attachments'   => 'nullable|array',
             'attachments.*' => 'file|mimes:jpg,jpeg,png,pdf|max:10240',
         ]);
 
-
-        // Depuración
-        Log::info('Request tiene archivos adjuntos: ' . $request->hasFile('attachments'));
-        if ($request->hasFile('attachments')) {
-            Log::info('Número de archivos: ' . count($request->file('attachments')));
-        }
+        // 1) Crear ticket inicial sin attachments
+        $ticket = Ticket::create([
+            'title'         => $request->title,
+            'description'   => $request->description,
+            'status'        => 'nuevo',
+            'priority'      => $request->priority,
+            'department_id' => $request->department_id,
+            'category_id'   => $request->category_id,
+            'assigned_to'   => $request->assigned_to,
+            'created_by'    => Auth::id(),
+            'attachments'   => null,
+        ]);
 
         $attachmentPaths = [];
 
+        // 2) Guardar archivos en carpeta específica del ticket
         if ($request->hasFile('attachments')) {
             foreach ($request->file('attachments') as $file) {
-                if (!$file->isValid()) {
+                if (! $file->isValid()) {
                     Log::error("Archivo no válido: " . $file->getClientOriginalName() . " - Error: " . $file->getErrorMessage());
                     continue;
                 }
-                $path = $file->store('attachments', 'public');
+                $path = $file->store("tickets/{$ticket->id}", 'public');
                 $attachmentPaths[] = $path;
             }
-        }
 
-        // Crear el ticket
-        $ticket = Ticket::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'status' => 'nuevo',
-            'priority' => $request->priority,
-            'department_id' => $request->department_id,
-            'category_id' => $request->category_id,
-            'assigned_to' => $request->assigned_to,
-            'created_by' => Auth::id(),
-            'attachments' => !empty($attachmentPaths) ? json_encode($attachmentPaths) : null,
-        ]);
+            // 3) Actualizar el ticket con rutas de attachments
+            $ticket->attachments = json_encode($attachmentPaths);
+            $ticket->save();
+        }
 
         Log::info('Ticket creado con ID: ' . $ticket->id);
         Log::info('Attachments guardados: ' . ($ticket->attachments ?? 'ninguno'));
 
-        return redirect()->route('tickets.index')->with('success', 'Ticket creado correctamente.');
+        return redirect()
+            ->route('tickets.index')
+            ->with('success', 'Ticket creado correctamente.');
     }
 
     // Mostrar detalles de un ticket
@@ -105,66 +104,64 @@ class TicketController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'status' => 'required|in:nuevo,en progreso,resuelto,cerrado',
-            'priority' => 'required|in:baja,media,alta,urgente',
-            'department_id' => 'nullable|exists:departments,id',
-            'category_id' => 'nullable|exists:categories,id',
-            'assigned_to' => 'nullable|exists:users,id',
-            'attachments.*' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
-            'resolution_notes' => 'nullable|string',
+            'title'             => 'required|string|max:255',
+            'description'       => 'required|string',
+            'status'            => 'required|in:nuevo,en progreso,resuelto,cerrado',
+            'priority'          => 'required|in:baja,media,alta,urgente',
+            'department_id'     => 'nullable|exists:departments,id',
+            'category_id'       => 'nullable|exists:categories,id',
+            'assigned_to'       => 'nullable|exists:users,id',
+            'attachments.*'     => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
+            'resolution_notes'  => 'nullable|string',
             'remove_attachments' => 'nullable|array',
             'remove_attachments.*' => 'string',
         ]);
 
         $ticket = Ticket::findOrFail($id);
 
-        // Obtener los archivos adjuntos actuales
+        // Obtener archivos actuales
         $currentAttachments = json_decode($ticket->attachments ?: '[]', true);
 
-        // Procesar archivos a eliminar si se especificaron
+        // Procesar eliminaciones
         if ($request->has('remove_attachments')) {
             foreach ($request->remove_attachments as $path) {
-                // Eliminar el archivo físico
                 Storage::disk('public')->delete($path);
-
-                // Eliminar de la lista de archivos adjuntos
-                $index = array_search($path, $currentAttachments);
-                if ($index !== false) {
+                if (($index = array_search($path, $currentAttachments)) !== false) {
                     unset($currentAttachments[$index]);
                 }
             }
-            // Reindexar el array
             $currentAttachments = array_values($currentAttachments);
         }
 
-        // Añadir nuevos archivos si existen
+        // Añadir nuevos archivos en carpeta del ticket
         if ($request->hasFile('attachments')) {
             foreach ($request->file('attachments') as $file) {
-                $currentAttachments[] = $file->store('attachments', 'public');
+                if (! $file->isValid()) continue;
+                $currentAttachments[] = $file->store("tickets/{$ticket->id}", 'public');
             }
         }
 
-        // Si el estado es "resuelto", guardar la fecha de resolución
-        if ($request->status === 'resuelto' && !$ticket->resolved_at) {
+        // Si cambia a resuelto y no tiene fecha, guardarla
+        if ($request->status === 'resuelto' && ! $ticket->resolved_at) {
             $ticket->resolved_at = now();
         }
 
-        // Actualizar el ticket con todos los datos
+        // Actualizar resto de campos
         $ticket->update([
-            'title' => $request->title,
-            'description' => $request->description,
-            'status' => $request->status,
-            'priority' => $request->priority,
-            'department_id' => $request->department_id,
-            'category_id' => $request->category_id,
-            'assigned_to' => $request->assigned_to,
+            'title'            => $request->title,
+            'description'      => $request->description,
+            'status'           => $request->status,
+            'priority'         => $request->priority,
+            'department_id'    => $request->department_id,
+            'category_id'      => $request->category_id,
+            'assigned_to'      => $request->assigned_to,
             'resolution_notes' => $request->resolution_notes,
-            'attachments' => json_encode($currentAttachments),
+            'attachments'      => json_encode($currentAttachments),
         ]);
 
-        return redirect()->route('tickets.index')->with('success', 'Ticket actualizado correctamente.');
+        return redirect()
+            ->route('tickets.index')
+            ->with('success', 'Ticket actualizado correctamente.');
     }
 
     // Eliminar un ticket
@@ -172,25 +169,23 @@ class TicketController extends Controller
     {
         $ticket = Ticket::findOrFail($id);
 
-        // Verificar si el usuario tiene permisos para eliminar el ticket
         if (Auth::user()->role !== 'admin' && $ticket->created_by !== Auth::id()) {
             abort(403, 'No tienes permiso para eliminar este ticket.');
         }
 
-        // Eliminar todos los archivos adjuntos
-        $attachments = json_decode($ticket->attachments ?: '[]', true);
-        foreach ($attachments as $path) {
-            Storage::disk('public')->delete($path);
-        }
+        // Eliminar carpeta entera de attachments
+        Storage::disk('public')->deleteDirectory("tickets/{$ticket->id}");
 
-        // Eliminar ticket
         $ticket->delete();
 
-        return redirect()->route('tickets.index')->with('success', 'Ticket eliminado correctamente.');
+        return redirect()
+            ->route('tickets.index')
+            ->with('success', 'Ticket eliminado correctamente.');
     }
+
+    // Asignar siguiente ticket disponible
     public function next()
     {
-        // Encuentra el primer ticket sin assigned_to
         $ticket = Ticket::whereNull('assigned_to')
             ->orderBy('created_at')
             ->first();
@@ -201,7 +196,7 @@ class TicketController extends Controller
 
         $ticket->update([
             'assigned_to' => Auth::id(),
-            'status'      => 'in_progress',  // o el que uses
+            'status'      => 'in_progress',
         ]);
 
         return redirect()
