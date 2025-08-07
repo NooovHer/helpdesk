@@ -1,92 +1,208 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-primary leading-tight">
-            {{ __('Panel de Agente de Soporte') }}
-        </h2>
-    </x-slot>
-
-    <div class="py-6">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <!-- Banner de agente -->
-            <div class="bg-primary rounded-lg shadow-md overflow-hidden">
-                <div class="px-6 py-8 md:flex md:items-center md:justify-between">
-                    <div class="text-white">
-                        <h2 class="text-2xl font-bold">
-                            Bienvenido(a), {{ auth()->user()->username }}
-                        </h2>
-                        <p class="mt-1">
-                            Tienes <strong>{{ $assignedCount }}</strong> tickets asignados
-                        </p>
+    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-100 py-8">
+        <div class="max-w-6xl mx-auto px-4 space-y-10">
+            <!-- Encabezado y métricas personales -->
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                <div class="flex items-center gap-5">
+                    <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-purple-500 via-purple-600 to-indigo-600 rounded-2xl shadow-lg text-white font-bold text-3xl">
+                        {{ strtoupper(substr(auth()->user()->username ?? 'A', 0, 1)) }}
                     </div>
-                    <div class="mt-4 md:mt-0">
-                        <a href="{{ route('agent.tickets.index') }}"
-                            class="inline-flex items-center px-5 py-3 bg-white text-primary font-semibold rounded-lg shadow hover:bg-gray-100 transition">
-                            Ver Mis Tickets
-                        </a>
+                    <div>
+                        <h1 class="text-3xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent mb-1">
+                            ¡Hola, {{ auth()->user()->username }}!
+                        </h1>
+                        <div class="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">
+                            <i class="fas fa-circle text-green-500 text-xs"></i> Disponible
+                        </div>
+                    </div>
+                </div>
+                <!-- Métricas personales -->
+                <div class="flex flex-wrap gap-4 justify-center">
+                    <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow p-4 flex flex-col items-center min-w-[120px]">
+                        <i class="fas fa-ticket-alt text-blue-500 text-xl mb-1"></i>
+                        <span class="text-xs text-gray-500">Abiertos</span>
+                        <span class="text-lg font-bold text-blue-800">{{ $assignedCount ?? 0 }}</span>
+                    </div>
+                    <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow p-4 flex flex-col items-center min-w-[120px]">
+                        <i class="fas fa-spinner text-yellow-500 text-xl mb-1"></i>
+                        <span class="text-xs text-gray-500">En Progreso</span>
+                        <span class="text-lg font-bold text-yellow-700">{{ $inProgressCount ?? 0 }}</span>
+                    </div>
+                    <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow p-4 flex flex-col items-center min-w-[120px]">
+                        <i class="fas fa-check-circle text-green-500 text-xl mb-1"></i>
+                        <span class="text-xs text-gray-500">Cerrados</span>
+                        <span class="text-lg font-bold text-green-700">{{ $closedCount ?? 0 }}</span>
+                    </div>
+                    <div class="bg-white/80 backdrop-blur-sm rounded-xl shadow p-4 flex flex-col items-center min-w-[120px]">
+                        <i class="fas fa-clock text-purple-500 text-xl mb-1"></i>
+                        <span class="text-xs text-gray-500">Resp. Promedio</span>
+                        <span class="text-lg font-bold text-purple-700">{{ $avgResponse ?? '--' }}</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Acciones rápidas -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-white shadow rounded-lg p-5 hover:shadow-md transition">
-                    <a href="{{ route('agent.tickets.index') }}" class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary mr-3" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414
-                                     5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <span class="text-lg font-medium text-gray-900">
-                            Mis Tickets
-                        </span>
+            <!-- Panel de notificaciones/alertas -->
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 rounded-xl p-4 flex items-center gap-3 shadow">
+                <i class="fas fa-bell text-yellow-500 text-2xl"></i>
+                <div>
+                    <span class="font-semibold text-yellow-800">¡Atención!</span>
+                    <span class="text-yellow-700">Tienes {{ $urgentCount ?? 0 }} tickets urgentes o vencidos.</span>
+                </div> 
+            </div>
+
+            <!-- Accesos rápidos -->
+            <div class="flex flex-wrap gap-4 justify-center">
+                <a href="{{ route('agent.tickets.index') }}" class="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transition shadow-lg">
+                    <i class="fas fa-list"></i> Mis Tickets
+                </a>
+                <a href="{{ route('agent.tickets.available') }}" class="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-gradient-to-r from-orange-500 to-orange-700 text-white hover:from-orange-600 hover:to-orange-800 transition shadow-lg">
+                    <i class="fas fa-hand-paper"></i> Tickets Disponibles
+                </a>
+                <form action="{{ route('agent.tickets.next') }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-gradient-to-r from-green-500 to-green-700 text-white hover:from-green-600 hover:to-green-800 transition shadow-lg">
+                        <i class="fas fa-play"></i> Tomar Siguiente
+                    </button>
+                </form>
+                <a href="{{ route('tickets.create') }}" class="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-gradient-to-r from-indigo-500 to-indigo-700 text-white hover:from-indigo-600 hover:to-indigo-800 transition shadow-lg">
+                    <i class="fas fa-plus"></i> Crear Ticket
+                </a>
+                <a href="#" class="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-gradient-to-r from-pink-500 to-pink-700 text-white hover:from-pink-600 hover:to-pink-800 transition shadow-lg">
+                    <i class="fas fa-book"></i> Base de Conocimientos
+                </a>
+                <a href="#" class="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-gradient-to-r from-yellow-500 to-yellow-700 text-white hover:from-yellow-600 hover:to-yellow-800 transition shadow-lg">
+                    <i class="fas fa-history"></i> Historial Resueltos
+                </a>
+            </div>
+
+            <!-- Tickets disponibles (nueva sección) -->
+            @if(isset($availableTickets) && $availableTickets->count() > 0)
+            <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg overflow-hidden">
+                <div class="border-b px-6 py-4 bg-orange-50 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-hand-paper text-orange-500 text-xl"></i>
+                        <h3 class="text-lg font-bold text-gray-700">Tickets Disponibles para Asignar</h3>
+                    </div>
+                    <span class="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-semibold">
+                        {{ $availableTickets->count() }} disponibles
+                    </span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-2 text-left font-semibold text-gray-500">ID</th>
+                                <th class="px-4 py-2 text-left font-semibold text-gray-500">Asunto</th>
+                                <th class="px-4 py-2 text-left font-semibold text-gray-500">Prioridad</th>
+                                <th class="px-4 py-2 text-left font-semibold text-gray-500">Departamento</th>
+                                <th class="px-4 py-2 text-left font-semibold text-gray-500">Creado</th>
+                                <th class="px-4 py-2 text-left font-semibold text-gray-500">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-100">
+                            @foreach($availableTickets->take(5) as $ticket)
+                            <tr>
+                                <td class="px-4 py-2 text-gray-700">{{ $ticket->id }}</td>
+                                <td class="px-4 py-2 text-gray-900">{{ Str::limit($ticket->title, 50) }}</td>
+                                <td class="px-4 py-2">
+                                    <span class="px-2 py-1 rounded-full text-xs font-semibold
+                                        @if($ticket->priority === 'alta') bg-red-100 text-red-800
+                                        @elseif($ticket->priority === 'media') bg-yellow-100 text-yellow-800
+                                        @else bg-blue-100 text-blue-800
+                                        @endif">
+                                        {{ ucfirst($ticket->priority) }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-2 text-gray-500">{{ $ticket->department->name ?? 'Sin departamento' }}</td>
+                                <td class="px-4 py-2 text-gray-500">{{ $ticket->created_at->diffForHumans() }}</td>
+                                <td class="px-4 py-2">
+                                    <form action="{{ route('agent.tickets.assign', $ticket) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="text-green-600 hover:text-green-800 font-semibold flex items-center gap-1">
+                                            <i class="fas fa-hand-paper"></i> Asignar
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                @if($availableTickets->count() > 5)
+                <div class="px-6 py-3 bg-gray-50 text-center">
+                    <a href="{{ route('agent.tickets.available') }}" class="text-blue-600 hover:text-blue-800 font-semibold">
+                        Ver todos los {{ $availableTickets->count() }} tickets disponibles
                     </a>
                 </div>
-                <div class="bg-white shadow rounded-lg p-5 hover:shadow-md transition">
-                    <form action="{{ route('agent.tickets.next') }}" method="POST" class="flex items-center">
-                        @csrf
-                        <button type="submit" class="w-full flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary mr-3" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                            </svg>
-                            <span class="text-lg font-medium text-gray-900">
-                                Tomar Siguiente Ticket
-                            </span>
-                        </button>
-                    </form>
+                @endif
+            </div>
+            @endif
+
+            <!-- Tickets asignados (tabla) -->
+            <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg overflow-hidden">
+                <div class="border-b px-6 py-4 bg-gray-50 flex items-center gap-2">
+                    <i class="fas fa-ticket-alt text-blue-500 text-xl"></i>
+                    <h3 class="text-lg font-bold text-gray-700">Tickets Asignados</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full text-sm">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-2 text-left font-semibold text-gray-500">ID</th>
+                                <th class="px-4 py-2 text-left font-semibold text-gray-500">Asunto</th>
+                                <th class="px-4 py-2 text-left font-semibold text-gray-500">Estado</th>
+                                <th class="px-4 py-2 text-left font-semibold text-gray-500">Prioridad</th>
+                                <th class="px-4 py-2 text-left font-semibold text-gray-500">Creado</th>
+                                <th class="px-4 py-2 text-left font-semibold text-gray-500">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-100">
+                            @forelse($assignedTickets as $ticket)
+                            <tr>
+                                <td class="px-4 py-2 text-gray-700">{{ $ticket->id }}</td>
+                                <td class="px-4 py-2 text-gray-900">{{ $ticket->title }}</td>
+                                <td class="px-4 py-2">
+                                    <span class="px-2 py-1 rounded-full text-xs font-semibold {{ $ticket->status_class }}">
+                                        {{ $ticket->status_label }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-2">
+                                    <span class="px-2 py-1 rounded-full text-xs font-semibold
+                                        @if($ticket->priority === 'alta') bg-red-100 text-red-800
+                                        @elseif($ticket->priority === 'media') bg-yellow-100 text-yellow-800
+                                        @else bg-blue-100 text-blue-800
+                                        @endif">
+                                        {{ ucfirst($ticket->priority) }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-2 text-gray-500">{{ $ticket->created_at->diffForHumans() }}</td>
+                                <td class="px-4 py-2">
+                                    <a href="{{ route('agent.tickets.show', $ticket) }}" class="text-blue-600 hover:underline font-semibold flex items-center gap-1">
+                                        <i class="fas fa-eye"></i> Ver
+                                    </a>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="6" class="py-6 px-6 text-center text-gray-500">No tienes tickets asignados.</td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-            <!-- Tickets asignados recientes -->
-            <div class="bg-white shadow rounded-lg overflow-hidden">
-                <div class="border-b px-6 py-4 bg-gray-50">
-                    <h3 class="text-lg font-medium text-gray-700">
-                        Tickets Recientes Asignados
-                    </h3>
+            <!-- Gráfica de desempeño (placeholder) -->
+            <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-8 flex flex-col items-center mt-4">
+                <h4 class="text-lg font-bold text-gray-700 mb-2 flex items-center gap-2">
+                    <i class="fas fa-chart-line text-green-500"></i> Desempeño Personal (Próximamente)
+                </h4>
+                <div class="w-full h-32 flex items-center justify-center text-gray-400">
+                    <span>Gráfica de tickets resueltos y satisfacción aparecerá aquí.</span>
                 </div>
-                <ul class="divide-y divide-gray-200">
-                    @forelse($recentAssigned as $ticket)
-                        <li class="px-6 py-4 flex justify-between items-center">
-                            <div>
-                                <p class="text-sm font-semibold text-gray-900">
-                                    #{{ $ticket->id }} — {{ $ticket->title }}
-                                </p>
-                                <p class="text-xs text-gray-500">
-                                    {{ $ticket->created_at->diffForHumans() }}
-                                </p>
-                            </div>
-                            <a href="{{ route('agent.tickets.show', $ticket) }}" class="text-primary hover:underline">
-                                Ver detalles
-                            </a>
-                        </li>
-                    @empty
-                        <li class="px-6 py-4 text-center text-gray-500">
-                            No tienes tickets asignados recientemente.
-                        </li>
-                    @endforelse
-                </ul>
             </div>
         </div>
     </div>
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </x-app-layout>

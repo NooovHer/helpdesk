@@ -3,16 +3,16 @@
         <div id="particles-js"></div>
 
         <div class="w-full max-w-md px-4 login-card">
-            <div class="bg-white shadow-2xl rounded-2xl overflow-hidden border-t-4 border-primary">
+            <div class="bg-white shadow-2xl rounded-2xl overflow-hidden border-t-4 border-purple-600">
                 <div class="p-8">
                     <div class="text-center mb-8">
                         <div class="flex justify-center mb-4">
-                            <div class="p-4 rounded-full bg-primary/10">
-                                <i class="fas fa-ticket-alt text-5xl text-primary"></i>
+                            <div class="p-4 rounded-full bg-gradient-to-br from-purple-500 via-purple-600 to-indigo-600 shadow-lg">
+                                <i class="fas fa-ticket-alt text-5xl text-white"></i>
                             </div>
                         </div>
-                        <h2 class="text-3xl font-bold text-gray-800">Mesa de Ayuda TI</h2>
-                        <p class="text-secondary mt-2">Inicia sesión para crear un ticket</p>
+                        <h2 class="text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">Mesa de Ayuda TI</h2>
+                        <p class="text-gray-500 mt-2">Inicia sesión para crear un ticket</p>
                     </div>
 
                     <form class="space-y-6" method="POST" action="{{ route('login') }}">
@@ -23,11 +23,11 @@
                             </label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center">
-                                    <i class="fas fa-user text-secondary"></i>
+                                    <i class="fas fa-user text-purple-500"></i>
                                 </span>
                                 <input type="text" id="username" name="username"
                                     placeholder="Ingresa tu nombre de usuario"
-                                    class="w-full pl-10 pr-4 py-3 border border-secondary/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition duration-300"
+                                    class="w-full pl-10 pr-4 py-3 border-2 border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-600 transition duration-300 shadow-sm"
                                     required>
                             </div>
                         </div>
@@ -38,11 +38,11 @@
                             </label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center">
-                                    <i class="fas fa-lock text-secondary"></i>
+                                    <i class="fas fa-lock text-purple-500"></i>
                                 </span>
                                 <input type="password" id="password" name="password"
                                     placeholder="Ingresa tu contraseña"
-                                    class="w-full pl-10 pr-4 py-3 border border-secondary/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition duration-300"
+                                    class="w-full pl-10 pr-4 py-3 border-2 border-purple-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-600 transition duration-300 shadow-sm"
                                     required>
                             </div>
                         </div>
@@ -50,7 +50,7 @@
                         <div class="flex items-center justify-between">
                             <div class="flex items-center">
                                 <input id="remember" name="remember" type="checkbox"
-                                    class="h-4 w-4 text-primary focus:ring-primary border-secondary rounded">
+                                    class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-purple-300 rounded">
                                 <label for="remember" class="ml-2 block text-sm text-gray-900">
                                     Recordarme
                                 </label>
@@ -58,7 +58,7 @@
 
                             <div>
                                 <a href="{{ route('password.request') }}"
-                                    class="text-sm text-primary hover:text-primary/80 transition duration-300">
+                                    class="text-sm text-purple-600 hover:text-indigo-600 transition duration-300">
                                     ¿Olvidaste tu contraseña?
                                 </a>
                             </div>
@@ -66,22 +66,23 @@
 
                         <div>
                             <button type="submit"
-                                class="w-full bg-primary text-white py-3 rounded-lg hover:bg-primary/90 transition duration-300 transform hover:scale-105">
-                                Iniciar Sesión
+                                class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-3 rounded-xl hover:from-purple-700 hover:to-indigo-700 transition duration-300 transform hover:scale-105 font-semibold shadow-lg">
+                                <i class="fas fa-sign-in-alt mr-2"></i> Iniciar Sesión
                             </button>
                         </div>
                     </form>
                 </div>
 
                 <div class="bg-gray-100 text-center p-4">
-                    <p class="text-sm text-secondary">
+                    <p class="text-sm text-gray-500">
                         ¿No tienes una cuenta?
+                        <a href="{{ route('register') }}" class="text-purple-600 hover:text-indigo-600 hover:underline font-semibold">Regístrate</a>
                     </p>
                 </div>
             </div>
 
-            <div class="text-center mt-6 text-secondary">
-                <p class="text-sm">© {{ date('Y') }} Mesa de Ayuda TI. Todos los derechos reservados.</p>
+            <div class="text-center mt-8 text-gray-400">
+                <p class="text-xs">© {{ date('Y') }} Mesa de Ayuda TI. Todos los derechos reservados.</p>
             </div>
         </div>
     </div>
@@ -195,4 +196,6 @@
             });
         </script>
     @endpush
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </x-guest-layout>

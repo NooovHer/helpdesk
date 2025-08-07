@@ -1,32 +1,34 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-primary leading-tight">
-            {{ __('Crear Nuevo Ticket') }}
-        </h2>
-    </x-slot>
+    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-100 py-8">
+        <div class="max-w-2xl mx-auto px-4">
+            <div class="text-center mb-8">
+                <h2 class="text-4xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent mb-2">Crear Nuevo Ticket</h2>
+                <p class="text-gray-600 text-base">Describe tu problema o solicitud y un agente te ayudará</p>
+            </div>
 
-    <div class="py-12 bg-gray-50">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             @if(session('success'))
-            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4" role="alert">
+            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded-xl shadow">
                 <p>{{ session('success') }}</p>
             </div>
             @endif
 
-            <div class="bg-white overflow-hidden shadow-lg sm:rounded-lg border border-gray-100">
-                <div class="p-8 text-gray-900">
-
-                    <h3 class="text-xl font-bold mb-6 text-primary border-b pb-2 border-gray-200">Nuevo Ticket</h3>
+            <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 overflow-hidden">
+                <div class="p-6 text-gray-900">
+                    <h3 class="text-xl font-bold mb-4 text-purple-700 flex items-center gap-2">
+                        <i class="fas fa-ticket-alt text-purple-500"></i> Nuevo Ticket
+                    </h3>
 
                     <!-- Formulario de creación de ticket -->
-                    <form action="{{ route('tickets.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                    <form action="{{ route('tickets.store') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
                         @csrf
 
                         <!-- Título -->
-                        <div class="mb-4">
-                            <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Título</label>
+                        <div>
+                            <label for="title" class="block text-sm font-semibold text-gray-700 mb-1 flex items-center gap-2">
+                                <i class="fas fa-heading text-gray-400"></i> Título
+                            </label>
                             <input type="text" name="title" id="title"
-                                class="block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-primary focus:border-primary transition"
+                                class="block w-full rounded-xl border-2 border-gray-200 px-4 py-2 text-gray-800 placeholder-gray-400 transition-all duration-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-100 focus:outline-none hover:border-gray-300 shadow-sm"
                                 value="{{ old('title') }}" required placeholder="Ingrese un título descriptivo">
                             @error('title')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -34,22 +36,26 @@
                         </div>
 
                         <!-- Descripción -->
-                        <div class="mb-4">
-                            <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-                            <textarea name="description" id="description" rows="5"
-                                class="block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-primary focus:border-primary transition"
+                        <div>
+                            <label for="description" class="block text-sm font-semibold text-gray-700 mb-1 flex items-center gap-2">
+                                <i class="fas fa-align-left text-gray-400"></i> Descripción
+                            </label>
+                            <textarea name="description" id="description" rows="4"
+                                class="block w-full rounded-xl border-2 border-gray-200 px-4 py-2 text-gray-800 placeholder-gray-400 transition-all duration-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-100 focus:outline-none hover:border-gray-300 shadow-sm"
                                 required placeholder="Describa detalladamente su problema o solicitud">{{ old('description') }}</textarea>
                             @error('description')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <!-- Prioridad -->
                             <div>
-                                <label for="priority" class="block text-sm font-medium text-gray-700 mb-1">Prioridad</label>
+                                <label for="priority" class="block text-sm font-semibold text-gray-700 mb-1 flex items-center gap-2">
+                                    <i class="fas fa-exclamation-triangle text-yellow-400"></i> Prioridad
+                                </label>
                                 <select name="priority" id="priority"
-                                    class="block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-primary focus:border-primary transition">
+                                    class="block w-full rounded-xl border-2 border-gray-200 px-4 py-2 text-gray-800 transition-all duration-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-100 focus:outline-none hover:border-gray-300 cursor-pointer">
                                     <option value="baja" {{ old('priority') == 'baja' ? 'selected' : '' }}>Baja</option>
                                     <option value="media" {{ old('priority') == 'media' ? 'selected' : '' }}>Media</option>
                                     <option value="alta" {{ old('priority') == 'alta' ? 'selected' : '' }}>Alta</option>
@@ -62,9 +68,11 @@
 
                             <!-- Departamento -->
                             <div>
-                                <label for="department_id" class="block text-sm font-medium text-gray-700 mb-1">Departamento</label>
+                                <label for="department_id" class="block text-sm font-semibold text-gray-700 mb-1 flex items-center gap-2">
+                                    <i class="fas fa-building text-blue-400"></i> Departamento
+                                </label>
                                 <select name="department_id" id="department_id"
-                                    class="block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-primary focus:border-primary transition">
+                                    class="block w-full rounded-xl border-2 border-gray-200 px-4 py-2 text-gray-800 transition-all duration-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-100 focus:outline-none hover:border-gray-300 cursor-pointer">
                                     <option value="">Seleccionar departamento...</option>
                                     @foreach ($departments as $department)
                                     <option value="{{ $department->id }}"
@@ -80,10 +88,12 @@
                         </div>
 
                         <!-- Categoría -->
-                        <div class="mb-4">
-                            <label for="category_id" class="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
+                        <div>
+                            <label for="category_id" class="block text-sm font-semibold text-gray-700 mb-1 flex items-center gap-2">
+                                <i class="fas fa-tags text-pink-400"></i> Categoría
+                            </label>
                             <select name="category_id" id="category_id"
-                                class="block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-primary focus:border-primary transition">
+                                class="block w-full rounded-xl border-2 border-gray-200 px-4 py-2 text-gray-800 transition-all duration-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-100 focus:outline-none hover:border-gray-300 cursor-pointer">
                                 <option value="">Seleccionar categoría...</option>
                                 @foreach ($categories as $category)
                                 <option value="{{ $category->id }}"
@@ -98,19 +108,21 @@
                         </div>
 
                         <!-- Archivo adjunto -->
-                        <div class="mb-6">
-                            <label for="attachments" class="block text-sm font-medium text-gray-700 mb-1">Adjuntar Archivos</label>
-                            <div id="drag-drop-area" class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed border-gray-300 rounded-md">
+                        <div>
+                            <label for="attachments" class="block text-sm font-semibold text-gray-700 mb-1 flex items-center gap-2">
+                                <i class="fas fa-paperclip text-gray-400"></i> Adjuntar Archivos
+                            </label>
+                            <div id="drag-drop-area" class="mt-1 flex justify-center px-6 pt-4 pb-4 border-2 border-dashed border-gray-300 rounded-xl bg-white/60">
                                 <div class="space-y-1 text-center">
-                                    <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                    <svg class="mx-auto h-10 w-10 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
                                         <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                     </svg>
-                                    <div class="flex text-sm text-gray-600">
+                                    <div class="flex text-sm text-gray-600 justify-center items-center gap-2">
                                         <label for="attachments" class="relative cursor-pointer bg-white rounded-md font-medium text-primary hover:text-hover focus-within:outline-none">
                                             <span>Seleccionar archivos</span>
                                             <input id="attachments" name="attachments[]" type="file" class="sr-only" multiple>
                                         </label>
-                                        <p class="pl-1">o arrastrar y soltar</p>
+                                        <span>o arrastrar y soltar</span>
                                     </div>
                                     <p class="text-xs text-gray-500">
                                         PNG, JPG, PDF hasta 10MB (Puede seleccionar varios archivos)
@@ -125,17 +137,17 @@
                             @enderror
 
                             <!-- Previsualización de archivos -->
-                            <div id="file-preview" class="mt-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"></div>
+                            <div id="file-preview" class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
                         </div>
 
                         <!-- Botón de enviar -->
-                        <div class="flex justify-end pt-4">
-                            <a href="{{ route('tickets.index') }}" class="mr-2 px-4 py-2 bg-secondary text-white rounded-lg hover:bg-opacity-80 transition">
-                                Cancelar
+                        <div class="flex justify-end pt-4 gap-2">
+                            <a href="{{ route('tickets.index') }}" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-xl hover:bg-gray-300 transition font-semibold flex items-center gap-2">
+                                <i class="fas fa-times"></i> Cancelar
                             </a>
                             <button type="submit"
-                                class="px-6 py-2 bg-primary text-white font-medium rounded-lg hover:bg-hover transition shadow-sm">
-                                Crear Ticket
+                                class="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl flex items-center gap-2">
+                                <i class="fas fa-paper-plane"></i> Crear Ticket
                             </button>
                         </div>
                     </form>

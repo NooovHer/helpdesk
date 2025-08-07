@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 // Asegúrate de importar los seeders
 use Database\Seeders\CategorySeeder;
 use Database\Seeders\DepartmentSeeder;
+use Database\Seeders\SystemStatusSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -19,5 +20,6 @@ class DatabaseSeeder extends Seeder
         // Llama a los seeders de Categorías y Departamentos
         $this->call(CategorySeeder::class);
         $this->call(DepartmentSeeder::class);
+        $this->call(SystemStatusSeeder::class);
     }
 }

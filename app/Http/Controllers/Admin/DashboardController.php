@@ -6,21 +6,31 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
     public function index()
     {
         $totalTickets  = Ticket::count();
-        $openTickets   = Ticket::where('status', 'open')->count();
-        $closedTickets = Ticket::where('status', 'closed')->count();
 
-        // Tomamos como “agentes” a quienes tengan role = manager y status = active
+        // Reemplazamos los contadores individuales por un solo query optimizado
+        $statusCounts = Ticket::select('status', DB::raw('count(*) as count'))
+            ->groupBy('status')
+            ->pluck('count', 'status'); // ['nuevo' => 5, 'en progreso' => 7, ...]
+
+        // Usamos los valores o 0 si no existen
+
+        $nuevoTickets      = $statusCounts['nuevo'] ?? 0;
+        $enProgresoTickets = $statusCounts['en progreso'] ?? 0;
+        $resueltoTickets   = $statusCounts['resuelto'] ?? 0;
+        $cerradoTickets    = $statusCounts['cerrado'] ?? 0;
+
+        // Mantienes tu lógica actual de agentes
         $onlineAgents = User::where('role', 'manager')
             ->where('status', 'active')
             ->count();
 
-        // Últimos tickets, cargando la relación assignedTo
         $recentTickets = Ticket::with('assignedTo')
             ->orderBy('created_at', 'desc')
             ->take(5)
@@ -28,8 +38,10 @@ class DashboardController extends Controller
 
         return view('admin.dashboard', compact(
             'totalTickets',
-            'openTickets',
-            'closedTickets',
+            'nuevoTickets',
+            'enProgresoTickets',
+            'resueltoTickets',
+            'cerradoTickets',
             'onlineAgents',
             'recentTickets'
         ));

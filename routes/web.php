@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TicketController;
@@ -10,6 +11,9 @@ use App\Http\Controllers\Admin\StatsController as AdminStatsController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Agent\TicketController as AgentTicketController;
 use App\Http\Controllers\Agent\DashboardController as AgentDashboardController;
+use App\Http\Controllers\Admin\ComputerController as AdminComputerController;
+use App\Http\Controllers\Agent\ComputerController as AgentComputerController;
+use App\Http\Controllers\SystemStatusController;
 
 // Redirección inicial
 Route::get('/', fn() => redirect('login'));
@@ -43,17 +47,43 @@ Route::middleware(['auth', 'role:agent'])
         Route::get('dashboard', [AgentDashboardController::class, 'index'])
             ->name('dashboard');
 
+        // Tickets disponibles para asignar
+        Route::get('tickets/available', [AgentTicketController::class, 'available'])
+            ->name('tickets.available');
+
         // CRUD de tickets del agente
         Route::resource('tickets', AgentTicketController::class)
             ->only(['index', 'show', 'update']);
 
-        // Ruta existente para “start”
-        Route::patch('tickets/{ticket}/start', [AgentTicketController::class, 'start'])
-            ->name('tickets.start');
 
-        // ← Agrega esta ruta para “tomar siguiente ticket”
+        // Asignar ticket específico
+        Route::post('tickets/{ticket}/assign', [AgentTicketController::class, 'assign'])
+            ->name('tickets.assign');
+
+        // Tomar siguiente ticket automáticamente
         Route::post('tickets/next', [AgentTicketController::class, 'next'])
             ->name('tickets.next');
+
+        // Liberar ticket (desasignar)
+        Route::post('tickets/{ticket}/release', [AgentTicketController::class, 'release'])
+            ->name('tickets.release');
+
+        // Agregar tickets a pendientes
+        Route::post('tickets/add-to-pending', [AgentTicketController::class, 'addToPending'])
+            ->name('tickets.add-to-pending');
+
+        // Asignar múltiples tickets
+        Route::post('tickets/assign-multiple', [AgentTicketController::class, 'assignMultiple'])
+            ->name('tickets.assign-multiple');
+
+        // Gestión de computadoras (visible/modificable por agentes)
+        Route::resource('computers', AgentComputerController::class)
+            ->only(['index', 'show', 'edit', 'update']);
+
+        // Gestión del estado del sistema (agentes también pueden modificar)
+        Route::resource('system-status', SystemStatusController::class);
+        Route::post('system-status/{systemStatus}/quick-update', [SystemStatusController::class, 'quickUpdate'])
+            ->name('system-status.quick-update');
     });
 // -----------------------------------------------------------
 // Dashboard y rutas **solo para administradores** (role:admin)
@@ -67,12 +97,23 @@ Route::middleware(['auth', 'role:admin'])
             ->name('dashboard');
 
         // Gestión de usuarios
-        Route::resource('users', AdminUserController::class)
-            ->except(['show']);
+        Route::resource('users', AdminUserController::class);
 
-        // Estadísticas generales
+        // Ruta para asignar roles a un usuario
+        Route::post('users/{user}/roles', [AdminUserController::class, 'assignRoles'])
+            ->name('users.roles');
+
+        // Estadísticas generalesm
         Route::get('stats', [AdminStatsController::class, 'index'])
             ->name('stats.index');
+
+        // Gestión de computadoras
+        Route::resource('computers', AdminComputerController::class);
+
+        // Gestión del estado del sistema
+        Route::resource('system-status', SystemStatusController::class);
+        Route::post('system-status/{systemStatus}/quick-update', [SystemStatusController::class, 'quickUpdate'])
+            ->name('system-status.quick-update');
     });
 
 require __DIR__ . '/auth.php';

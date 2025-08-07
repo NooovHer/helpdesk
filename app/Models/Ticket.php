@@ -73,4 +73,60 @@ class Ticket extends Model
     {
         return $this->hasMany(TicketComment::class);
     }
+
+    /** Obtener el estado formateado */
+    public function getStatusLabelAttribute()
+    {
+        return match($this->status) {
+            'abierto' => 'Abierto',
+            'en progreso' => 'En Progreso',
+            'resuelto' => 'Resuelto',
+            'cerrado' => 'Cerrado',
+            default => ucfirst($this->status)
+        };
+    }
+
+    /** Obtener la clase CSS para el estado */
+    public function getStatusClassAttribute()
+    {
+        return match($this->status) {
+            'abierto' => 'bg-blue-100 text-blue-800',
+            'en progreso' => 'bg-yellow-100 text-yellow-800',
+            'resuelto' => 'bg-green-100 text-green-800',
+            'cerrado' => 'bg-gray-100 text-gray-800',
+            default => 'bg-gray-100 text-gray-800'
+        };
+    }
+
+    /** Verificar si el ticket está asignado */
+    public function isAssigned()
+    {
+        return !is_null($this->assigned_to);
+    }
+
+    /** Verificar si el ticket está disponible para asignar */
+    public function isAvailable()
+    {
+        return is_null($this->assigned_to) && $this->status !== 'cerrado';
+    }
+
+    /** Verificar si el ticket es urgente */
+    public function isUrgent()
+    {
+        return $this->priority === 'alta' && $this->status !== 'cerrado';
+    }
+
+    /** Scope: tickets disponibles para asignar */
+    public function scopeAvailable($query)
+    {
+        return $query->whereNull('assigned_to')
+            ->where('status', '!=', 'cerrado');
+    }
+
+    /** Scope: tickets urgentes */
+    public function scopeUrgent($query)
+    {
+        return $query->where('priority', 'alta')
+            ->where('status', '!=', 'cerrado');
+    }
 }

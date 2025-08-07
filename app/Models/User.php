@@ -6,6 +6,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 
+
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
@@ -37,5 +38,12 @@ class User extends Authenticatable
     public function assignedTickets()
     {
         return $this->hasMany(Ticket::class, 'assigned_to');
+    }
+
+    // Relación con PC
+
+    public function pc()
+    {
+        return $this->hasMany(Computer::class, 'assigned_user_id');
     }
 }

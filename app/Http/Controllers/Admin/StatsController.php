@@ -11,7 +11,7 @@ class StatsController extends Controller
 {
     public function index()
     {
-        // Ejemplo de datos, ajusta según tus necesidades
+
         $ticketsPerStatus = Ticket::select('status', DB::raw('count(*) as total'))
             ->groupBy('status')->get();
         $agentsCount      = User::where('role', 'agent')->count();

@@ -13,6 +13,7 @@ class DashboardController extends Controller
         $user = auth::user();
 
         if ($user && $user->role === 'admin') {
+            $tickets = Ticket::orderBy('created_at', 'desc')->get();
             return redirect()->route('admin.dashboard');
         }
 
