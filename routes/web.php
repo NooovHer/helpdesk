@@ -14,7 +14,7 @@ use App\Http\Controllers\Agent\DashboardController as AgentDashboardController;
 use App\Http\Controllers\Admin\ComputerController as AdminComputerController;
 use App\Http\Controllers\Agent\ComputerController as AgentComputerController;
 use App\Http\Controllers\SystemStatusController;
-
+use App\Http\Controllers\Admin\CompanyController;
 // Redirección inicial
 Route::get('/', fn() => redirect('login'));
 
@@ -109,6 +109,9 @@ Route::middleware(['auth', 'role:admin'])
 
         // Gestión de computadoras
         Route::resource('computers', AdminComputerController::class);
+
+        // Gestión de companies (empresas)
+        Route::resource('companies', CompanyController::class);
 
         // Gestión del estado del sistema
         Route::resource('system-status', SystemStatusController::class);

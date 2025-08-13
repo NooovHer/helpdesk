@@ -38,9 +38,7 @@ class AuthenticatedSessionController extends Controller
             return redirect()->intended(route('dashboard'));
         }
 
-        return back()->withErrors([
-            'email' => 'Las credenciales no coinciden con nuestros registros.',
-        ]);
+        return back()->with('error', 'Las credenciales proporcionadas son incorrectas.');
     }
 
 

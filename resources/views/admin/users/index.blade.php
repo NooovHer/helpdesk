@@ -104,6 +104,9 @@
                                 <div>
                                     <h3 class="font-semibold text-gray-800 truncate">{{ $user->name }}</h3>
                                     <p class="text-sm text-gray-500">ID: {{ $user->id }}</p>
+                                    @if($user->company)
+                                    <p class="text-xs text-purple-600 font-semibold">{{ $user->company->nombre }}</p>
+                                    @endif
                                 </div>
                             </div>
                             <div class="flex items-center space-x-1">
@@ -227,6 +230,7 @@
                             <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Correo</th>
                             <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rol</th>
                             <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Equipo</th>
+                            <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Compañía</th>
                             <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                             <th class="py-3 px-6 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                         </tr>
@@ -267,6 +271,13 @@
                                 </div>
                                 @else
                                 <span class="text-gray-400">Sin equipo</span>
+                                @endif
+                            </td>
+                            <td class="py-3 px-6 text-sm text-gray-900">
+                                @if($user->company)
+                                    {{ $user->company->nombre }}
+                                @else
+                                    <span class="text-gray-400">Sin compañía</span>
                                 @endif
                             </td>
                             <td class="py-3 px-6">

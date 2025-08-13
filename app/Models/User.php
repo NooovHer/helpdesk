@@ -20,6 +20,7 @@ class User extends Authenticatable
         'department_id',
         'hire_date',
         'status',
+        'empresa_id',
     ];
 
     // Relación con Department
@@ -45,5 +46,9 @@ class User extends Authenticatable
     public function pc()
     {
         return $this->hasMany(Computer::class, 'assigned_user_id');
+    }
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'empresa_id');
     }
 }
