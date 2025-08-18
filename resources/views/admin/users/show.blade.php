@@ -17,6 +17,17 @@
                         Visualizando información de:
                         <span class="font-semibold text-purple-600">{{ $user->name }}</span>
                     </p>
+                    @if($user->company)
+                    <div class="inline-flex items-center gap-2 mt-2 px-3 py-1 bg-purple-100 rounded-full text-sm text-purple-700 font-semibold">
+                        <i class="fas fa-building text-xs"></i>
+                        {{ $user->company->nombre }}
+                    </div>
+                    @else
+                    <div class="inline-flex items-center gap-2 mt-2 px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">
+                        <i class="fas fa-building text-xs"></i>
+                        Sin compañía
+                    </div>
+                    @endif
                     <div class="inline-flex items-center gap-2 mt-2 px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600">
                         <i class="fas fa-id-badge text-xs"></i>
                         ID: {{ $user->id }}

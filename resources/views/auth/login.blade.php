@@ -15,6 +15,12 @@
                         <p class="text-gray-500 mt-2">Inicia sesión para crear un ticket</p>
                     </div>
 
+                    @if (session('error'))
+                        <div class="mb-4 font-medium text-sm text-red-600 bg-red-100 border border-red-300 rounded-lg p-3 text-center">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
                     <form class="space-y-6" method="POST" action="{{ route('login') }}">
                         @csrf
                         <div>

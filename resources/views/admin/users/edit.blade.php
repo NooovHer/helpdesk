@@ -124,6 +124,24 @@
                                         </div>
                                     @enderror
                                 </div>
+                                <div class="group">
+                                    <label for="empresa_id" class="block text-sm font-semibold text-gray-700 mb-2 transition-colors group-focus-within:text-purple-600">
+                                        <i class="fas fa-building mr-2 text-gray-400 group-focus-within:text-purple-600"></i>
+                                        Compañía
+                                    </label>
+                                    <select name="empresa_id" id="empresa_id" class="block w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-gray-800 transition-all duration-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 focus:outline-none hover:border-gray-300 cursor-pointer">
+                                        <option value="" class="text-gray-400">Selecciona una compañía</option>
+                                        @foreach($companies as $company)
+                                            <option value="{{ $company->id }}" @if(old('empresa_id', $user->empresa_id) == $company->id) selected @endif>{{ $company->nombre }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('empresa_id')
+                                        <div class="mt-2 flex items-center gap-2 text-red-600 text-sm">
+                                            <i class="fas fa-exclamation-circle"></i>
+                                            <span>{{ $message }}</span>
+                                        </div>
+                                    @enderror
+                                </div>
                             </div>
                         </div>
 

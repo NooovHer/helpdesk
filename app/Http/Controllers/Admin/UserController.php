@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Computer;
+use App\Models\Company;
 
 class UserController extends Controller
 {
@@ -28,9 +29,9 @@ class UserController extends Controller
 
     public function create()
     {
-        $computers = Computer::all(); // o puedes filtrar solo los disponibles
-
-        return view('admin.users.create', compact('computers'));
+        $computers = Computer::all();
+        $companies = Company::all();
+        return view('admin.users.create', compact('computers', 'companies'));
     }
 
 
@@ -40,18 +41,21 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
+            'name'          => 'required|string|max:255',
             'username'      => 'required|string|max:255|unique:users,username',
             'email'         => 'required|email|max:255|unique:users,email',
             'password'      => 'required|string|confirmed|min:8',
-            'role'          => ['required', Rule::in(['admin', 'employee', 'manager'])],
+            'role'          => ['required', Rule::in(['admin', 'employee', 'agent'])],
             'id_employee'   => 'nullable|string|max:255',
             'department_id' => 'nullable|exists:departments,id',
             'hire_date'     => 'nullable|date',
             'status'        => ['required', Rule::in(['active', 'inactive', 'suspended'])],
+            'empresa_id'    => 'nullable|exists:companies,id',
         ]);
 
         $user = new User(collect($data)->except('password')->toArray());
         $user->password = Hash::make($data['password']);
+        $user->empresa_id = $data['empresa_id'] ?? null;
         $user->save();
 
         return redirect()->route('admin.users.index')
@@ -63,7 +67,8 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        return view('admin.users.edit', compact('user'));
+        $companies = Company::all();
+        return view('admin.users.edit', compact('user', 'companies'));
     }
     public function show($id)
     {
@@ -76,14 +81,16 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $data = $request->validate([
+            'name'          => ['required', 'string', 'max:255'],
             'username'      => ['required', 'string', 'max:255', Rule::unique('users', 'username')->ignore($user->id)],
             'email'         => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'password'      => 'nullable|string|confirmed|min:8',
-            'role'          => ['required', Rule::in(['admin', 'employee', 'manager'])],
+            'role'          => ['required', Rule::in(['admin', 'employee', 'agent'])],
             'id_employee'   => 'nullable|string|max:255',
             'department_id' => 'nullable|exists:departments,id',
             'hire_date'     => 'nullable|date',
             'status'        => ['required', Rule::in(['active', 'inactive', 'suspended'])],
+            'empresa_id'    => 'nullable|exists:companies,id',
         ]);
 
         if (!empty($data['password'])) {
@@ -91,6 +98,7 @@ class UserController extends Controller
         }
 
         $user->fill(collect($data)->except('password')->toArray());
+        $user->empresa_id = $data['empresa_id'] ?? null;
         $user->save();
 
         return redirect()->route('admin.users.index')
