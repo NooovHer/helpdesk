@@ -41,10 +41,11 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
+            'name'          => 'required|string|max:255',
             'username'      => 'required|string|max:255|unique:users,username',
             'email'         => 'required|email|max:255|unique:users,email',
             'password'      => 'required|string|confirmed|min:8',
-            'role'          => ['required', Rule::in(['admin', 'employee', 'manager'])],
+            'role'          => ['required', Rule::in(['admin', 'employee', 'agent'])],
             'id_employee'   => 'nullable|string|max:255',
             'department_id' => 'nullable|exists:departments,id',
             'hire_date'     => 'nullable|date',
@@ -80,10 +81,11 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $data = $request->validate([
+            'name'          => ['required', 'string', 'max:255'],
             'username'      => ['required', 'string', 'max:255', Rule::unique('users', 'username')->ignore($user->id)],
             'email'         => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'password'      => 'nullable|string|confirmed|min:8',
-            'role'          => ['required', Rule::in(['admin', 'employee', 'manager'])],
+            'role'          => ['required', Rule::in(['admin', 'employee', 'agent'])],
             'id_employee'   => 'nullable|string|max:255',
             'department_id' => 'nullable|exists:departments,id',
             'hire_date'     => 'nullable|date',
