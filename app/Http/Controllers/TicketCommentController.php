@@ -5,13 +5,18 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Ticket;
 use App\Models\TicketComment;
-use app\Models\User;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class TicketCommentController extends Controller
 {
     public function store(Request $request, Ticket $ticket)
     {
+        // Verificar que el usuario solo pueda comentar en tickets que creó, a menos que sea admin o agente
+        if (Auth::user()->role !== 'admin' && Auth::user()->role !== 'agent' && $ticket->getAttribute('created_by') !== Auth::id()) {
+            abort(403, 'No tienes permiso para comentar en este ticket.');
+        }
+
         $request->validate([
             'content' => 'required|string',
             'attachments.*' => 'nullable|file|max:10240', // 10MB max por archivo
@@ -35,7 +40,7 @@ class TicketCommentController extends Controller
         $comment->save();
 
         // Actualizar la fecha de actualización del ticket
-        $ticket->touch();
+        $ticket->update(['updated_at' => now()]);
 
         return redirect()->back()->with('success', 'Comentario agregado correctamente.');
     }

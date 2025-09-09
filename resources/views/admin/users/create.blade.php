@@ -85,6 +85,58 @@
                                 </div>
                                 @enderror
                             </div>
+
+                            {{-- ID Empleado --}}
+                            <div>
+                                <label for="id_employee" class="block text-sm font-semibold text-gray-700 mb-3">
+                                    <i class="fas fa-id-badge mr-2 text-gray-500"></i>
+                                    RH ID Empleado
+                                </label>
+                                <input type="text" name="id_employee" id="id_employee" value="{{ old('id_employee') }}"
+                                    class="block w-full h-12 rounded-xl border-2 border-gray-200 px-4 text-gray-800 placeholder-gray-400 transition-all duration-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:outline-none hover:border-gray-300"
+                                    placeholder="Ej: EMP001">
+                                @error('id_employee')
+                                <div class="mt-2 flex items-center gap-2 text-red-600 text-sm">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    <span>{{ $message }}</span>
+                                </div>
+                                @enderror
+                            </div>
+
+                            {{-- Fecha de contratación --}}
+                            <div>
+                                <label for="hire_date" class="block text-sm font-semibold text-gray-700 mb-3">
+                                    <i class="fas fa-calendar-alt mr-2 text-gray-500"></i>
+                                    Fecha de contratación
+                                </label>
+                                <input type="date" name="hire_date" id="hire_date" value="{{ old('hire_date') }}"
+                                    class="block w-full h-12 rounded-xl border-2 border-gray-200 px-4 text-gray-800 transition-all duration-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:outline-none hover:border-gray-300">
+                                @error('hire_date')
+                                <div class="mt-2 flex items-center gap-2 text-red-600 text-sm">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    <span>{{ $message }}</span>
+                                </div>
+                                @enderror
+                            </div>
+
+                            {{-- Estado en línea --}}
+                            <div>
+                                <label for="is_online" class="block text-sm font-semibold text-gray-700 mb-3">
+                                    <i class="fas fa-circle mr-2 text-gray-500"></i>
+                                    Estado en línea
+                                </label>
+                                <select name="is_online" id="is_online"
+                                    class="block w-full h-12 rounded-xl border-2 border-gray-200 px-4 text-gray-800 transition-all duration-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:outline-none hover:border-gray-300 cursor-pointer">
+                                    <option value="0" @if(old('is_online')==='0') selected @endif>🔴 Desconectado</option>
+                                    <option value="1" @if(old('is_online')==='1') selected @endif>🟢 En línea</option>
+                                </select>
+                                @error('is_online')
+                                <div class="mt-2 flex items-center gap-2 text-red-600 text-sm">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    <span>{{ $message }}</span>
+                                </div>
+                                @enderror
+                            </div>
                         </div>
                     </div>
 
@@ -225,6 +277,29 @@
                                     @endforeach
                                 </select>
                                 @error('empresa_id')
+                                <div class="mt-2 flex items-center gap-2 text-red-600 text-sm">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    <span>{{ $message }}</span>
+                                </div>
+                                @enderror
+                            </div>
+
+                            {{-- Departamento --}}
+                            <div>
+                                <label for="department_id" class="block text-sm font-semibold text-gray-700 mb-3">
+                                    <i class="fas fa-sitemap mr-2 text-gray-500"></i>
+                                    Departamento
+                                </label>
+                                <select name="department_id" id="department_id"
+                                    class="block w-full h-12 rounded-xl border-2 border-gray-200 px-4 text-gray-800 transition-all duration-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 focus:outline-none hover:border-gray-300 cursor-pointer">
+                                    <option value="" class="text-gray-400">Selecciona un departamento</option>
+                                    @foreach($departments as $department)
+                                    <option value="{{ $department->id }}" @if(old('department_id')==$department->id) selected @endif>
+                                        🏢 {{ $department->name }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                                @error('department_id')
                                 <div class="mt-2 flex items-center gap-2 text-red-600 text-sm">
                                     <i class="fas fa-exclamation-circle"></i>
                                     <span>{{ $message }}</span>

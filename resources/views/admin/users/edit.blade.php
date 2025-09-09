@@ -42,7 +42,7 @@
                         <div class="text-sm text-green-600 font-medium">Rol Actual</div>
                         <div class="text-green-800 font-semibold capitalize">
                             @if($user->role === 'admin') 🔴 Administrador
-                            @elseif($user->role === 'manager') 🟡 Encargado
+                            @elseif($user->role === 'agent') 🟡 Agente
                             @else 🟢 Usuario
                             @endif
                         </div>
@@ -87,18 +87,41 @@
                                     </label>
                                     <div class="relative">
                                         <input type="text" name="name" id="name" value="{{ old('name', $user->name) }}"
-                                               class="block w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-gray-800 placeholder-gray-400 transition-all duration-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 focus:outline-none hover:border-gray-300"
-                                               placeholder="Ingresa el nombre completo"
-                                               required>
+                                            class="block w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-gray-800 placeholder-gray-400 transition-all duration-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 focus:outline-none hover:border-gray-300"
+                                            placeholder="Ingresa el nombre completo"
+                                            required>
                                         <div class="absolute inset-y-0 right-0 flex items-center pr-3">
                                             <i class="fas fa-check text-green-500 opacity-100 transition-opacity duration-200" id="name-check"></i>
                                         </div>
                                     </div>
                                     @error('name')
-                                        <div class="mt-2 flex items-center gap-2 text-red-600 text-sm">
-                                            <i class="fas fa-exclamation-circle"></i>
-                                            <span>{{ $message }}</span>
+                                    <div class="mt-2 flex items-center gap-2 text-red-600 text-sm">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        <span>{{ $message }}</span>
+                                    </div>
+                                    @enderror
+                                </div>
+
+                                {{-- Username --}}
+                                <div class="group">
+                                    <label for="username" class="block text-sm font-semibold text-gray-700 mb-2 transition-colors group-focus-within:text-purple-600">
+                                        <i class="fas fa-user-tag mr-2 text-gray-400 group-focus-within:text-purple-600"></i>
+                                        Usuario
+                                    </label>
+                                    <div class="relative">
+                                        <input type="text" name="username" id="username" value="{{ old('username', $user->username) }}"
+                                            class="block w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-gray-800 placeholder-gray-400 transition-all duration-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 focus:outline-none hover:border-gray-300"
+                                            placeholder="Ej: juan.perez"
+                                            required>
+                                        <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                                            <i class="fas fa-check text-green-500 opacity-100 transition-opacity duration-200" id="username-check"></i>
                                         </div>
+                                    </div>
+                                    @error('username')
+                                    <div class="mt-2 flex items-center gap-2 text-red-600 text-sm">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        <span>{{ $message }}</span>
+                                    </div>
                                     @enderror
                                 </div>
 
@@ -110,20 +133,39 @@
                                     </label>
                                     <div class="relative">
                                         <input type="email" name="email" id="email" value="{{ old('email', $user->email) }}"
-                                               class="block w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-gray-800 placeholder-gray-400 transition-all duration-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 focus:outline-none hover:border-gray-300"
-                                               placeholder="usuario@ejemplo.com"
-                                               required>
+                                            class="block w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-gray-800 placeholder-gray-400 transition-all duration-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 focus:outline-none hover:border-gray-300"
+                                            placeholder="usuario@ejemplo.com"
+                                            required>
                                         <div class="absolute inset-y-0 right-0 flex items-center pr-3">
                                             <i class="fas fa-check text-green-500 opacity-100 transition-opacity duration-200" id="email-check"></i>
                                         </div>
                                     </div>
                                     @error('email')
-                                        <div class="mt-2 flex items-center gap-2 text-red-600 text-sm">
-                                            <i class="fas fa-exclamation-circle"></i>
-                                            <span>{{ $message }}</span>
-                                        </div>
+                                    <div class="mt-2 flex items-center gap-2 text-red-600 text-sm">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        <span>{{ $message }}</span>
+                                    </div>
                                     @enderror
                                 </div>
+
+                                {{-- ID Empleado --}}
+                                <div class="group">
+                                    <label for="id_employee" class="block text-sm font-semibold text-gray-700 mb-2 transition-colors group-focus-within:text-purple-600">
+                                        <i class="fas fa-id-badge mr-2 text-gray-400 group-focus-within:text-purple-600"></i>
+                                        RH ID Empleado
+                                    </label>
+                                    <input type="text" name="id_employee" id="id_employee" value="{{ old('id_employee', $user->id_employee) }}"
+                                        class="block w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-gray-800 placeholder-gray-400 transition-all duration-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 focus:outline-none hover:border-gray-300"
+                                        placeholder="Ej: EMP001">
+                                    @error('id_employee')
+                                    <div class="mt-2 flex items-center gap-2 text-red-600 text-sm">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        <span>{{ $message }}</span>
+                                    </div>
+                                    @enderror
+                                </div>
+
+                                {{-- Compañía --}}
                                 <div class="group">
                                     <label for="empresa_id" class="block text-sm font-semibold text-gray-700 mb-2 transition-colors group-focus-within:text-purple-600">
                                         <i class="fas fa-building mr-2 text-gray-400 group-focus-within:text-purple-600"></i>
@@ -132,16 +174,73 @@
                                     <select name="empresa_id" id="empresa_id" class="block w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-gray-800 transition-all duration-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 focus:outline-none hover:border-gray-300 cursor-pointer">
                                         <option value="" class="text-gray-400">Selecciona una compañía</option>
                                         @foreach($companies as $company)
-                                            <option value="{{ $company->id }}" @if(old('empresa_id', $user->empresa_id) == $company->id) selected @endif>{{ $company->nombre }}</option>
+                                        <option value="{{ $company->id }}" @if(old('empresa_id', $user->empresa_id) == $company->id) selected @endif>{{ $company->nombre }}</option>
                                         @endforeach
                                     </select>
                                     @error('empresa_id')
-                                        <div class="mt-2 flex items-center gap-2 text-red-600 text-sm">
-                                            <i class="fas fa-exclamation-circle"></i>
-                                            <span>{{ $message }}</span>
-                                        </div>
+                                    <div class="mt-2 flex items-center gap-2 text-red-600 text-sm">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        <span>{{ $message }}</span>
+                                    </div>
                                     @enderror
                                 </div>
+
+                                {{-- Departamento --}}
+                                <div class="group">
+                                    <label for="department_id" class="block text-sm font-semibold text-gray-700 mb-2 transition-colors group-focus-within:text-purple-600">
+                                        <i class="fas fa-sitemap mr-2 text-gray-400 group-focus-within:text-purple-600"></i>
+                                        Departamento
+                                    </label>
+                                    <select name="department_id" id="department_id" class="block w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-gray-800 transition-all duration-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 focus:outline-none hover:border-gray-300 cursor-pointer">
+                                        <option value="" class="text-gray-400">Selecciona un departamento</option>
+                                        @foreach($departments as $department)
+                                        <option value="{{ $department->id }}" @if(old('department_id', $user->department_id) == $department->id) selected @endif>{{ $department->name }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('department_id')
+                                    <div class="mt-2 flex items-center gap-2 text-red-600 text-sm">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        <span>{{ $message }}</span>
+                                    </div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Equipos de cómputo asignados --}}
+                        <div class="space-y-6">
+                            <div class="flex items-center gap-3 pb-3 border-b border-gray-200">
+                                <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-laptop text-purple-600 text-sm"></i>
+                                </div>
+                                <h3 class="text-lg font-semibold text-gray-800">Equipos de cómputo asignados</h3>
+                                <span class="inline-flex items-center px-3 py-1 text-xs bg-purple-100 text-purple-700 rounded-full">
+                                    Opcional
+                                </span>
+                            </div>
+
+                            <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg shadow-gray-200/50 border border-white/20 p-6">
+                                <p class="text-sm text-gray-600 mb-3 flex items-center gap-2">
+                                    <i class="fas fa-info-circle text-purple-500"></i>
+                                    Selecciona uno o varios equipos asignados al usuario.
+                                </p>
+
+                                <select id="computers" name="computers[]" multiple
+                                    class="block w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-gray-800 placeholder-gray-400 transition-all duration-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 hover:border-gray-300 cursor-pointer">
+                                    @foreach($computers as $computer)
+                                    <option value="{{ $computer->id }}"
+                                        @if(collect(old('computers', $user->pc->pluck('id') ?? []))->contains($computer->id)) selected @endif>
+                                        {{ $computer->computer_name ?? 'Equipo #' . $computer->id }}
+                                    </option>
+                                    @endforeach
+                                </select>
+
+                                @error('computers')
+                                <div class="mt-2 flex items-center gap-2 text-red-600 text-sm">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    <span>{{ $message }}</span>
+                                </div>
+                                @enderror
                             </div>
                         </div>
 
@@ -161,23 +260,23 @@
                                     Nivel de acceso
                                 </label>
                                 <select name="role" id="role"
-                                        class="block w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-gray-800 transition-all duration-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 focus:outline-none hover:border-gray-300 cursor-pointer"
-                                        required>
+                                    class="block w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-gray-800 transition-all duration-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 focus:outline-none hover:border-gray-300 cursor-pointer"
+                                    required>
                                     <option value="admin" @if(old('role', $user->role) === 'admin') selected @endif class="text-red-600 font-medium">
                                         🔴 Administrador - Acceso completo
                                     </option>
-                                    <option value="manager" @if(old('role', $user->role) === 'manager') selected @endif class="text-orange-600 font-medium">
-                                        🟡 Encargado - Gestión y supervisión
+                                    <option value="agent" @if(old('role', $user->role) === 'agent') selected @endif class="text-orange-600 font-medium">
+                                        🟡 Agente - Gestión y supervisión
                                     </option>
                                     <option value="user" @if(old('role', $user->role) === 'user') selected @endif class="text-green-600 font-medium">
                                         🟢 Usuario - Acceso básico
                                     </option>
                                 </select>
                                 @error('role')
-                                    <div class="mt-2 flex items-center gap-2 text-red-600 text-sm">
-                                        <i class="fas fa-exclamation-circle"></i>
-                                        <span>{{ $message }}</span>
-                                    </div>
+                                <div class="mt-2 flex items-center gap-2 text-red-600 text-sm">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    <span>{{ $message }}</span>
+                                </div>
                                 @enderror
                             </div>
                         </div>
@@ -210,151 +309,47 @@
                                     <label for="password" class="block text-sm font-semibold text-gray-700 mb-2 transition-colors group-focus-within:text-purple-600">
                                         <i class="fas fa-lock mr-2 text-gray-400 group-focus-within:text-purple-600"></i>
                                         Nueva contraseña
-                                        <span class="text-xs text-gray-500 ml-2">(opcional)</span>
                                     </label>
-                                    <div class="relative">
-                                        <input type="password" name="password" id="password"
-                                               class="block w-full rounded-xl border-2 border-gray-200 px-4 py-3 pr-12 text-gray-800 placeholder-gray-400 transition-all duration-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 focus:outline-none hover:border-gray-300"
-                                               placeholder="Dejar en blanco para mantener actual">
-                                        <button type="button" onclick="togglePassword('password')"
-                                                class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 transition-colors">
-                                            <i class="fas fa-eye" id="password-eye"></i>
-                                        </button>
-                                    </div>
+                                    <input type="password" name="password" id="password"
+                                        class="block w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-gray-800 placeholder-gray-400 transition-all duration-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 hover:border-gray-300"
+                                        placeholder="********">
                                     @error('password')
-                                        <div class="mt-2 flex items-center gap-2 text-red-600 text-sm">
-                                            <i class="fas fa-exclamation-circle"></i>
-                                            <span>{{ $message }}</span>
-                                        </div>
+                                    <div class="mt-2 flex items-center gap-2 text-red-600 text-sm">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        <span>{{ $message }}</span>
+                                    </div>
                                     @enderror
                                 </div>
 
-                                {{-- Confirmar nueva contraseña --}}
+                                {{-- Confirmar contraseña --}}
                                 <div class="group">
                                     <label for="password_confirmation" class="block text-sm font-semibold text-gray-700 mb-2 transition-colors group-focus-within:text-purple-600">
                                         <i class="fas fa-lock mr-2 text-gray-400 group-focus-within:text-purple-600"></i>
                                         Confirmar nueva contraseña
                                     </label>
-                                    <div class="relative">
-                                        <input type="password" name="password_confirmation" id="password_confirmation"
-                                               class="block w-full rounded-xl border-2 border-gray-200 px-4 py-3 pr-12 text-gray-800 placeholder-gray-400 transition-all duration-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 focus:outline-none hover:border-gray-300"
-                                               placeholder="Repite la nueva contraseña">
-                                        <button type="button" onclick="togglePassword('password_confirmation')"
-                                                class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 transition-colors">
-                                            <i class="fas fa-eye" id="password_confirmation-eye"></i>
-                                        </button>
-                                    </div>
+                                    <input type="password" name="password_confirmation" id="password_confirmation"
+                                        class="block w-full rounded-xl border-2 border-gray-200 px-4 py-3 text-gray-800 placeholder-gray-400 transition-all duration-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 hover:border-gray-300"
+                                        placeholder="********">
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    {{-- Botones de acción mejorados --}}
-                    <div class="flex flex-col sm:flex-row gap-4 pt-8 mt-8 border-t border-gray-200">
-                        <button type="submit"
-                                class="flex items-center justify-center gap-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 focus:ring-4 focus:ring-purple-200 focus:outline-none">
-                            <i class="fas fa-save text-lg"></i>
-                            <span class="text-lg">Guardar Cambios</span>
-                        </button>
-
-                        <a href="{{ route('admin.users.show', $user) }}"
-                           class="flex items-center justify-center gap-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold px-8 py-4 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 focus:ring-4 focus:ring-gray-200 focus:outline-none">
-                            <i class="fas fa-times text-lg"></i>
-                            <span class="text-lg">Cancelar</span>
-                        </a>
-
-                        <a href="{{ route('admin.users.show', $user) }}"
-                           class="flex items-center justify-center gap-3 bg-blue-100 hover:bg-blue-200 text-blue-800 font-semibold px-8 py-4 rounded-xl transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 focus:ring-4 focus:ring-blue-200 focus:outline-none">
-                            <i class="fas fa-eye text-lg"></i>
-                            <span class="text-lg">Ver Perfil</span>
-                        </a>
+                        {{-- Botones --}}
+                        <div class="flex items-center justify-end gap-4 pt-6 border-t border-gray-200">
+                            <a href="{{ route('admin.users.index') }}"
+                                class="px-6 py-3 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 flex items-center gap-2 shadow-sm">
+                                <i class="fas fa-arrow-left"></i>
+                                Cancelar
+                            </a>
+                            <button type="submit"
+                                class="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold hover:shadow-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-200 flex items-center gap-2 shadow-md">
+                                <i class="fas fa-save"></i>
+                                Guardar Cambios
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
-
-            {{-- Información sobre cambios --}}
-            <div class="bg-purple-50 border border-purple-200 rounded-2xl p-6">
-                <div class="flex items-start gap-4">
-                    <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
-                        <i class="fas fa-shield-check text-purple-600 text-sm"></i>
-                    </div>
-                    <div>
-                        <h4 class="font-semibold text-purple-900 mb-2">Seguridad y cambios</h4>
-                        <ul class="text-purple-800 text-sm space-y-1">
-                            <li>• Todos los cambios quedan registrados en el historial del sistema</li>
-                            <li>• Si cambias el email, el usuario recibirá una notificación</li>
-                            <li>• Los cambios de rol son efectivos inmediatamente</li>
-                            <li>• La contraseña actual se mantendrá si dejas los campos en blanco</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
-
-    {{-- JavaScript para mejorar la interactividad --}}
-    <script>
-        // Toggle password visibility
-        function togglePassword(fieldId) {
-            const field = document.getElementById(fieldId);
-            const icon = document.getElementById(fieldId + '-eye');
-
-            if (field.type === 'password') {
-                field.type = 'text';
-                icon.classList.replace('fa-eye', 'fa-eye-slash');
-            } else {
-                field.type = 'password';
-                icon.classList.replace('fa-eye-slash', 'fa-eye');
-            }
-        }
-
-        // Validación visual en tiempo real
-        document.addEventListener('DOMContentLoaded', function() {
-            const nameField = document.getElementById('name');
-            const emailField = document.getElementById('email');
-            const nameCheck = document.getElementById('name-check');
-            const emailCheck = document.getElementById('email-check');
-
-            // Ya están poblados, así que mostramos los checks
-            if (nameField.value.length >= 2) {
-                nameCheck.style.opacity = '1';
-            }
-
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (emailRegex.test(emailField.value)) {
-                emailCheck.style.opacity = '1';
-            }
-
-            nameField.addEventListener('input', function() {
-                if (this.value.length >= 2) {
-                    nameCheck.style.opacity = '1';
-                } else {
-                    nameCheck.style.opacity = '0';
-                }
-            });
-
-            emailField.addEventListener('input', function() {
-                if (emailRegex.test(this.value)) {
-                    emailCheck.style.opacity = '1';
-                } else {
-                    emailCheck.style.opacity = '0';
-                }
-            });
-
-            // Confirmación de cambios importantes
-            const roleSelect = document.getElementById('role');
-            const originalRole = '{{ $user->role }}';
-
-            roleSelect.addEventListener('change', function() {
-                if (this.value !== originalRole) {
-                    // Mostrar indicador visual de cambio
-                    this.style.borderColor = '#f59e0b';
-                    this.style.backgroundColor = '#fef3c7';
-                } else {
-                    this.style.borderColor = '';
-                    this.style.backgroundColor = '';
-                }
-            });
-        });
-    </script>
 </x-app-layout>

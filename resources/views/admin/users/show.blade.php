@@ -52,7 +52,7 @@
                         <div class="text-sm text-green-600 font-medium">Rol</div>
                         <div class="text-green-800 font-semibold capitalize">
                             @if($user->role === 'admin') 🔴 Administrador
-                            @elseif($user->role === 'manager') 🟡 Encargado
+                            @elseif($user->role === 'agent') 🟡 Agente
                             @else 🟢 Usuario
                             @endif
                         </div>

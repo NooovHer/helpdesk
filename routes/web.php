@@ -15,8 +15,26 @@ use App\Http\Controllers\Admin\ComputerController as AdminComputerController;
 use App\Http\Controllers\Agent\ComputerController as AgentComputerController;
 use App\Http\Controllers\SystemStatusController;
 use App\Http\Controllers\Admin\CompanyController;
+use App\Http\Controllers\FaviconController;
 // Redirección inicial
 Route::get('/', fn() => redirect('login'));
+
+// Favicon dinámico
+Route::get('/favicon.ico', [FaviconController::class, 'show'])->name('favicon');
+
+// Ruta de prueba para debug
+Route::get('/test-favicon', function() {
+    try {
+        $favicon = \App\Helpers\CompanyHelper::getCurrentUserCompanyFavicon();
+        return response()->json([
+            'favicon_url' => $favicon,
+            'user' => auth()->user() ? auth()->user()->toArray() : 'No autenticado',
+            'company' => auth()->user() && auth()->user()->empresa_id ? \App\Models\Company::find(auth()->user()->empresa_id) : 'Sin empresa'
+        ]);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()]);
+    }
+});
 
 // Dashboard general (usuario común)
 Route::middleware('auth')

@@ -20,8 +20,14 @@ class User extends Authenticatable
         'id_employee',
         'department_id',
         'hire_date',
+        'is_online',
         'status',
         'empresa_id',
+    ];
+
+    protected $casts = [
+        'hire_date' => 'date',
+        'is_online' => 'boolean',
     ];
 
     // Relación con Department

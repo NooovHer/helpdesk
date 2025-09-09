@@ -43,7 +43,7 @@ class Ticket extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    /** Relación con el usuario (manager/agente) asignado */
+    /** Relación con el usuario (agente) asignado */
     public function assignedTo()
     {
         return $this->belongsTo(User::class, 'assigned_to');

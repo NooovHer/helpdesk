@@ -29,11 +29,6 @@ class TicketController extends Controller
      */
     public function show(Ticket $ticket)
     {
-        // Verificar que el ticket esté asignado al agente actual
-        if ($ticket->assigned_to !== Auth::id()) {
-            abort(403, 'No tienes acceso a este ticket.');
-        }
-
         $ticket->load('creator', 'assignedTo', 'department', 'category', 'comments.user');
 
         return view('agent.tickets.show', compact('ticket'));
@@ -45,9 +40,9 @@ class TicketController extends Controller
     public function update(Request $request, Ticket $ticket)
     {
         // Verificar que el ticket esté asignado al agente actual
-        if ($ticket->assigned_to !== Auth::id()) {
-            abort(403, 'No tienes acceso a este ticket.');
-        }
+       if ($ticket->assigned_to !== Auth::id()) {
+    abort(403, 'Solo puedes actualizar tickets que te han sido asignados.');
+}
 
         $request->validate([
             'status' => 'required|in:abierto,en progreso,resuelto,cerrado',

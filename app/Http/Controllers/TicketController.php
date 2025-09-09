@@ -12,10 +12,11 @@ use App\Models\Category;
 
 class TicketController extends Controller
 {
-    // Mostrar todos los tickets
+    // Mostrar solo los tickets del usuario autenticado
     public function index()
     {
         $tickets = Ticket::with('creator', 'assignedTo', 'department', 'category')
+            ->where('created_by', Auth::id())
             ->orderBy('created_at', 'desc')
             ->get();
         return view('tickets.index', compact('tickets'));
@@ -83,20 +84,30 @@ class TicketController extends Controller
             ->with('success', 'Ticket creado correctamente.');
     }
 
-    // Mostrar detalles de un ticket
+    // Mostrar detalles de un ticket (solo si el usuario lo creó o es admin/agente)
     public function show($id)
     {
         $ticket = Ticket::with('creator', 'assignedTo', 'department', 'category')->findOrFail($id);
+
+        // Verificar que el usuario solo pueda ver tickets que creó, a menos que sea admin o agente
+        if (Auth::user()->role !== 'admin' && Auth::user()->role !== 'agent' && $ticket->created_by !== Auth::id()) {
+            abort(403, 'No tienes permiso para ver este ticket.');
+        }
+
         return view('tickets.show', compact('ticket'));
     }
 
-    // Mostrar formulario de edición
+    // Mostrar formulario de edición (solo si el usuario lo creó o es admin/agente)
     public function edit($id)
     {
         $ticket = Ticket::findOrFail($id);
+
+        // Verificar que el usuario solo pueda editar tickets que creó, a menos que sea admin o agente
+        if (Auth::user()->role !== 'admin' && Auth::user()->role !== 'agent' && $ticket->created_by !== Auth::id()) {
+            abort(403, 'No tienes permiso para editar este ticket.');
+        }
         $departments = Department::all();
         $categories = Category::all();
-
         return view('tickets.edit', compact('ticket', 'departments', 'categories'));
     }
 
@@ -118,6 +129,11 @@ class TicketController extends Controller
         ]);
 
         $ticket = Ticket::findOrFail($id);
+
+        // Verificar que el usuario solo pueda actualizar tickets que creó, a menos que sea admin o agente
+        if (Auth::user()->role !== 'admin' && Auth::user()->role !== 'agent' && $ticket->created_by !== Auth::id()) {
+            abort(403, 'No tienes permiso para actualizar este ticket.');
+        }
 
         // Obtener archivos actuales
         $currentAttachments = json_decode($ticket->attachments ?: '[]', true);
@@ -169,7 +185,7 @@ class TicketController extends Controller
     {
         $ticket = Ticket::findOrFail($id);
 
-        if (Auth::user()->role !== 'admin' && $ticket->created_by !== Auth::id()) {
+        if (Auth::user()->role !== 'admin' && Auth::user()->role !== 'agent' && $ticket->created_by !== Auth::id()) {
             abort(403, 'No tienes permiso para eliminar este ticket.');
         }
 

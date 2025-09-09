@@ -11,7 +11,7 @@
                     Portal de Soporte TI
                 </h1>
                 <p class="text-gray-600 text-lg">
-                    ¡Bienvenido(a), <span class="font-semibold text-purple-600">{{ auth()->user()->username }}</span>!
+                    ¡Bienvenido(a), <span class="font-semibold text-purple-600">{{ auth()->user()->name }}</span>!
                 </p>
                 <p class="text-gray-500">¿En qué podemos ayudarte hoy?</p>
             </div>

@@ -2,7 +2,11 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
         <!-- Logo -->
         <a href="{{ route('dashboard') }}" class="flex items-center">
-            <img src="/logo.svg" alt="Logo" class="h-9 w-9 rounded-full object-cover" />
+                                    <div class="h-12 w-12 flex items-center justify-center">
+                <img src="{{ \App\Helpers\CompanyHelper::getCurrentUserCompanyLogo() }}"
+                     alt="{{ \App\Helpers\CompanyHelper::getCurrentUserCompanyName() }}"
+                     class="max-h-full max-w-full object-contain" />
+            </div>
         </a>
         <!-- Links -->
         <div class="hidden sm:flex space-x-8">
@@ -18,6 +22,9 @@
             </x-nav-link>
             <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
                 Usuarios
+            </x-nav-link>
+            <x-nav-link :href="route('admin.companies.index')" :active="request()->routeIs('admin.companies.*')">
+                Empresas
             </x-nav-link>
             {{-- <x-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')">
                     Categorías

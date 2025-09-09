@@ -1,0 +1,9 @@
+Sugerencias de mejora específicas para el flujo de tickets
+Automatización de asignación: Permitir reglas automáticas para asignar tickets según carga, especialidad o prioridad.
+Recordatorios y vencimientos: Notificar al agente cuando un ticket está próximo a vencer o lleva mucho tiempo sin atención.
+Historial de acciones: Mostrar un log de todas las acciones realizadas en cada ticket (asignación, cambios de estado, comentarios).
+Feedback del usuario: Al cerrar un ticket, solicitar retroalimentación del usuario para medir satisfacción.
+Panel de seguimiento: Agregar una sección donde el agente vea tickets en espera de respuesta del usuario.
+Indicadores de SLA: Mostrar si el ticket está dentro o fuera del tiempo de atención esperado.
+Acciones rápidas: Permitir cambiar estado, agregar comentario o reasignar desde la lista sin entrar al detalle.
+Etiquetas o categorías: Permitir que el agente agregue etiquetas para clasificar tickets según tipo de problema.

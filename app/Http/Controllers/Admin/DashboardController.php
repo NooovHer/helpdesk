@@ -27,7 +27,7 @@ class DashboardController extends Controller
         $cerradoTickets    = $statusCounts['cerrado'] ?? 0;
 
         // Mantienes tu lógica actual de agentes
-        $onlineAgents = User::where('role', 'manager')
+        $onlineAgents = User::where('role', 'agent')
             ->where('status', 'active')
             ->count();
 
