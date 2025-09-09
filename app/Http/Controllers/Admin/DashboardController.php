@@ -36,6 +36,16 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+            // Feedback de tickets (últimos 10)
+            $recentFeedback = \App\Models\TicketFeedback::with(['ticket', 'user'])
+                ->orderBy('created_at', 'desc')
+                ->take(10)
+                ->get();
+
+            // Estadísticas de satisfacción
+            $avgRating = \App\Models\TicketFeedback::avg('rating');
+            $feedbackCount = \App\Models\TicketFeedback::count();
+
         return view('admin.dashboard', compact(
             'totalTickets',
             'nuevoTickets',
@@ -44,6 +54,9 @@ class DashboardController extends Controller
             'cerradoTickets',
             'onlineAgents',
             'recentTickets'
+                ,'recentFeedback'
+                ,'avgRating'
+                ,'feedbackCount'
         ));
     }
 }

@@ -145,6 +145,47 @@
                     </table>
                 </div>
             </div>
+                <!-- Feedback de usuarios -->
+                <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg overflow-hidden mt-10">
+                    <div class="border-b px-6 py-4 bg-yellow-50 flex items-center justify-between">
+                        <h3 class="text-lg font-medium text-gray-700 flex items-center gap-2">
+                            <i class="fas fa-star text-yellow-500"></i> Feedback de Usuarios
+                        </h3>
+                        <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-semibold">
+                            Promedio: {{ number_format($avgRating, 2) }} / 5 &bull; Total: {{ $feedbackCount }}
+                        </span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-left font-semibold text-gray-500">Ticket</th>
+                                    <th class="px-4 py-2 text-left font-semibold text-gray-500">Usuario</th>
+                                    <th class="px-4 py-2 text-left font-semibold text-gray-500">Calificación</th>
+                                    <th class="px-4 py-2 text-left font-semibold text-gray-500">Comentario</th>
+                                    <th class="px-4 py-2 text-left font-semibold text-gray-500">Fecha</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-100">
+                                @forelse($recentFeedback as $feedback)
+                                <tr>
+                                    <td class="px-4 py-2 text-blue-700 font-semibold">#{{ $feedback->ticket->id ?? '-' }}</td>
+                                    <td class="px-4 py-2 text-gray-900">{{ $feedback->user->username ?? 'Usuario' }}</td>
+                                    <td class="px-4 py-2">
+                                        <span class="text-yellow-600 font-bold">{{ $feedback->rating }} <i class="fas fa-star"></i></span>
+                                    </td>
+                                    <td class="px-4 py-2 text-gray-700">{{ $feedback->comment ?? '-' }}</td>
+                                    <td class="px-4 py-2 text-gray-500">{{ $feedback->created_at->format('d/m/Y H:i') }}</td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="5" class="py-6 px-6 text-center text-gray-500">No hay feedback registrado aún.</td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
         </div>
     </div>
 </x-app-layout>

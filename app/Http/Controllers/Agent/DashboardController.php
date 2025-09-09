@@ -18,6 +18,16 @@ class DashboardController extends Controller
         // Tickets asignados al agente
         $assignedTickets = Ticket::where('assigned_to', $user->id)->latest()->get();
 
+            // Tickets próximos a vencer (por ejemplo, vencen en menos de 24h)
+            $soonDueTickets = $assignedTickets->filter(function($ticket) {
+                return isset($ticket->due_date) && $ticket->status !== 'cerrado' && now()->diffInHours($ticket->due_date, false) <= 24 && now()->lt($ticket->due_date);
+            });
+
+            // Tickets sin atención reciente (sin actualización en más de 48h)
+            $staleTickets = $assignedTickets->filter(function($ticket) {
+                return $ticket->status !== 'cerrado' && $ticket->updated_at->diffInHours(now()) > 48;
+            });
+
         // Tickets disponibles para asignar (sin agente asignado)
         $availableTickets = Ticket::whereNull('assigned_to')
             ->where('status', '!=', 'cerrado')
@@ -42,6 +52,8 @@ class DashboardController extends Controller
             'closedCount',
             'avgResponse',
             'urgentCount'
+                ,'soonDueTickets'
+                ,'staleTickets'
         ));
     }
 }

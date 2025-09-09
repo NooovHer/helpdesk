@@ -22,6 +22,14 @@ class TicketCommentController extends Controller
             'attachments.*' => 'nullable|file|max:10240', // 10MB max por archivo
         ]);
 
+            // Registrar acción en el historial
+            \App\Models\TicketAction::create([
+                'ticket_id' => $ticket->id,
+                'user_id' => Auth::id(),
+                'action_type' => 'comentario',
+                'description' => 'Comentario agregado: ' . \Illuminate\Support\Str::limit($request->content, 50),
+            ]);
+
         $attachments = [];
         if ($request->hasFile('attachments')) {
             foreach ($request->file('attachments') as $file) {

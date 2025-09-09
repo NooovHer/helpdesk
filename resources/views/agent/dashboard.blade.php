@@ -47,7 +47,19 @@
                 <div>
                     <span class="font-semibold text-yellow-800">¡Atención!</span>
                     <span class="text-yellow-700">Tienes {{ $urgentCount ?? 0 }} tickets urgentes o vencidos.</span>
-                </div> 
+                        @if(isset($soonDueTickets) && $soonDueTickets->count())
+                            <div class="mt-2 text-yellow-700">
+                                <i class="fas fa-hourglass-half text-yellow-600"></i>
+                                {{ $soonDueTickets->count() }} ticket(s) próximos a vencer en menos de 24h.
+                            </div>
+                        @endif
+                        @if(isset($staleTickets) && $staleTickets->count())
+                            <div class="mt-2 text-orange-700">
+                                <i class="fas fa-exclamation-triangle text-orange-600"></i>
+                                {{ $staleTickets->count() }} ticket(s) sin atención en más de 48h.
+                            </div>
+                        @endif
+                </div>
             </div>
 
             <!-- Accesos rápidos -->
@@ -64,8 +76,8 @@
                         <i class="fas fa-play"></i> Tomar Siguiente
                     </button>
                 </form>
-                <a href="{{ route('tickets.create') }}" class="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-gradient-to-r from-indigo-500 to-indigo-700 text-white hover:from-indigo-600 hover:to-indigo-800 transition shadow-lg">
-                    <i class="fas fa-plus"></i> Crear Ticket
+                <a href="{{ route('agent.tickets.create-user') }}" class="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-gradient-to-r from-indigo-500 to-indigo-700 text-white hover:from-indigo-600 hover:to-indigo-800 transition shadow-lg">
+                    <i class="fas fa-user-plus"></i> Crear Ticket para Usuario
                 </a>
                 <a href="#" class="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-gradient-to-r from-pink-500 to-pink-700 text-white hover:from-pink-600 hover:to-pink-800 transition shadow-lg">
                     <i class="fas fa-book"></i> Base de Conocimientos

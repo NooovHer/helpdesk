@@ -29,9 +29,9 @@ class TicketController extends Controller
      */
     public function show(Ticket $ticket)
     {
-        $ticket->load('creator', 'assignedTo', 'department', 'category', 'comments.user');
-
-        return view('agent.tickets.show', compact('ticket'));
+    $ticket->load('creator', 'assignedTo', 'department', 'category', 'comments.user');
+    $actions = \App\Models\TicketAction::where('ticket_id', $ticket->id)->orderBy('created_at', 'desc')->get();
+    return view('agent.tickets.show', compact('ticket', 'actions'));
     }
 
     /**
@@ -54,6 +54,14 @@ class TicketController extends Controller
             'resolution_notes' => $request->resolution_notes,
             'resolved_at' => $request->status === 'resuelto' ? now() : null,
         ]);
+
+            // Registrar acción en el historial
+            \App\Models\TicketAction::create([
+                'ticket_id' => $ticket->id,
+                'user_id' => Auth::id(),
+                'action_type' => 'estado actualizado',
+                'description' => 'Estado cambiado a ' . $request->status,
+            ]);
 
         return redirect()
             ->route('agent.tickets.show', $ticket)
@@ -91,6 +99,14 @@ class TicketController extends Controller
             'status' => 'en progreso',
         ]);
 
+            // Registrar acción en el historial
+            \App\Models\TicketAction::create([
+                'ticket_id' => $ticket->id,
+                'user_id' => Auth::id(),
+                'action_type' => 'asignado',
+                'description' => 'Ticket asignado al agente',
+            ]);
+
         return redirect()
             ->route('agent.tickets.show', $ticket)
             ->with('success', 'Ticket asignado correctamente.');
@@ -116,6 +132,14 @@ class TicketController extends Controller
             'status' => 'en progreso',
         ]);
 
+            // Registrar acción en el historial
+            \App\Models\TicketAction::create([
+                'ticket_id' => $ticket->id,
+                'user_id' => Auth::id(),
+                'action_type' => 'asignado',
+                'description' => 'Ticket asignado automáticamente al agente',
+            ]);
+
         return redirect()
             ->route('agent.tickets.show', $ticket)
             ->with('success', 'Ticket asignado automáticamente.');
@@ -135,6 +159,14 @@ class TicketController extends Controller
             'assigned_to' => null,
             'status' => 'abierto',
         ]);
+
+            // Registrar acción en el historial
+            \App\Models\TicketAction::create([
+                'ticket_id' => $ticket->id,
+                'user_id' => Auth::id(),
+                'action_type' => 'liberado',
+                'description' => 'Ticket liberado por el agente',
+            ]);
 
         return redirect()
             ->route('agent.tickets.index')

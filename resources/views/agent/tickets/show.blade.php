@@ -68,6 +68,34 @@
                         @else
                         <p class="text-gray-500 italic">No hay comentarios aún.</p>
                         @endif
+                        <!-- Feedback al cerrar el ticket -->
+                        @if($ticket->status === 'cerrado' && Auth::id() === $ticket->creator->id)
+                        <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 mt-6">
+                            <h3 class="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
+                                <i class="fas fa-star text-yellow-500"></i>
+                                Califica la atención recibida
+                            </h3>
+                            <form action="{{ route('tickets.feedback.store', $ticket) }}" method="POST" class="space-y-4">
+                                @csrf
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Calificación</label>
+                                    <select name="rating" class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                                        <option value="">Selecciona...</option>
+                                        @for($i=1; $i<=5; $i++)
+                                            <option value="{{ $i }}">{{ $i }} estrella{{ $i > 1 ? 's' : '' }}</option>
+                                        @endfor
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Comentario</label>
+                                    <textarea name="comment" rows="3" placeholder="¿Cómo fue tu experiencia?" class="w-full px-4 py-2 border border-gray-300 rounded-lg"></textarea>
+                                </div>
+                                <button type="submit" class="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition font-semibold">
+                                    <i class="fas fa-paper-plane mr-2"></i>Enviar Feedback
+                                </button>
+                            </form>
+                        </div>
+                        @endif
 
                         <!-- Formulario para nuevo comentario -->
                         <form action="{{ route('tickets.comments.store', $ticket) }}" method="POST" class="mt-6">
@@ -80,6 +108,30 @@
                                 </button>
                             </div>
                         </form>
+
+                        <!-- Historial de acciones -->
+                        <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 mt-6">
+                            <h3 class="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
+                                <i class="fas fa-history text-purple-500"></i>
+                                Historial de acciones
+                            </h3>
+                            @if(isset($actions) && $actions->count())
+                                <ul class="space-y-2">
+                                    @foreach($actions as $action)
+                                        <li class="border-l-4 border-purple-400 pl-4 py-2">
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <span class="font-semibold text-gray-700">{{ $action->user->username ?? 'Usuario' }}</span>
+                                                <span class="text-xs text-gray-500">{{ $action->created_at->diffForHumans() }}</span>
+                                            </div>
+                                            <span class="text-gray-600">{{ ucfirst($action->action_type) }}:</span>
+                                            <span class="text-gray-800">{{ $action->description }}</span>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @else
+                                <p class="text-gray-500 italic">No hay acciones registradas aún.</p>
+                            @endif
+                        </div>
                     </div>
                 </div>
 

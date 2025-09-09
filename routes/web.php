@@ -52,6 +52,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('tickets', TicketController::class);
     Route::post('tickets/{ticket}/comments', [TicketCommentController::class, 'store'])
         ->name('tickets.comments.store');
+    // Feedback al cerrar ticket
+    Route::post('tickets/{ticket}/feedback', [\App\Http\Controllers\TicketFeedbackController::class, 'store'])
+        ->name('tickets.feedback.store');
 });
 
 // -----------------------------------------------------------
@@ -68,6 +71,10 @@ Route::middleware(['auth', 'role:agent'])
         // Tickets disponibles para asignar
         Route::get('tickets/available', [AgentTicketController::class, 'available'])
             ->name('tickets.available');
+
+        // Crear ticket para usuario (ruta única para evitar conflicto)
+        Route::get('tickets/create-user', [\App\Http\Controllers\Agent\TicketCreateController::class, 'create'])->name('tickets.create-user');
+        Route::post('tickets/store-user', [\App\Http\Controllers\Agent\TicketCreateController::class, 'store'])->name('tickets.store-user');
 
         // CRUD de tickets del agente
         Route::resource('tickets', AgentTicketController::class)
@@ -110,6 +117,9 @@ Route::middleware(['auth', 'role:admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
+        // Panel de feedback de tickets
+        Route::get('feedback', [\App\Http\Controllers\Admin\FeedbackController::class, 'index'])->name('feedback.index');
+        Route::get('feedback/export', [\App\Http\Controllers\Admin\FeedbackController::class, 'export'])->name('feedback.export');
         // Panel de administrador
         Route::get('dashboard', [AdminDashboardController::class, 'index'])
             ->name('dashboard');
